@@ -1,5 +1,3 @@
-SHELL := /bin/zsh
-
 ifeq ($(OS),Windows_NT)
   ifeq ($(shell uname -s),) # not in a bash-like shell
 	CLEANUP = del /F /Q
@@ -51,13 +49,13 @@ IGNORE = `grep -s IGNORE $(PATHR)*.txt`
 all: test compile install
 
 test: $(BUILD_PATHS) $(RESULTS)
-	@echo "-----------------------\nIGNORES:\n-----------------------"
-	@echo "$(IGNORE)"
-	@echo "-----------------------\nFAILURES:\n-----------------------"
-	@echo "$(FAIL)"
-	@echo "-----------------------\nPASSED:\n-----------------------"
-	@echo "$(PASSED)"
-	@echo "\nDONE"
+	@echo -e "-----------------------\nIGNORES:\n-----------------------"
+	@echo -e "$(IGNORE)"
+	@echo -e "-----------------------\nFAILURES:\n-----------------------"
+	@echo -e "$(FAIL)"
+	@echo -e "-----------------------\nPASSED:\n-----------------------"
+	@echo -e "$(PASSED)"
+	@echo -e "\nDONE"
 
 $(PATHR)%.txt: $(PATHB)%.$(TARGET_EXTENSION)
 	-./$< > $@ 2>&1
