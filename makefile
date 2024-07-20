@@ -26,19 +26,19 @@ PATHB = build/
 PATHD = build/depends/
 PATHO = build/objs/
 PATHR = build/results/
-OBJS = $(patsubst %,$(PATHO)%,$(_OBJS))
 
 TARGET = server
 
 BUILD_PATHS = $(PATHB) $(PATHD) $(PATHO) $(PATHR)
 
 SRCT = $(wildcard $(PATHT)*.c)
+SRCS = $(wildcard $(PATHS)*.c)
+OBJS = $(SRCS:$(PATHS)/%.c=$(PATHO)/%.o)
 
 COMPILE=gcc -c
 LINK=gcc
 DEPEND=gcc -MM -MG -MF
 CFLAGS=-I. -I$(PATHU) -I$(PATHS) -DTEST
-_OBJS = main.o calc.o
 
 RESULTS = $(patsubst $(PATHT)Test%.c,$(PATHR)Test%.txt,$(SRCT) )
 
@@ -46,9 +46,9 @@ PASSED = `grep -s PASS $(PATHR)*.txt`
 FAIL = `grep -s FAIL $(PATHR)*.txt`
 IGNORE = `grep -s IGNORE $(PATHR)*.txt`
 
-all: test compile install
+all: test
 
-test: $(BUILD_PATHS) $(RESULTS)
+test: compile
 	@echo -e "-----------------------\nIGNORES:\n-----------------------"
 	@echo -e "$(IGNORE)"
 	@echo -e "-----------------------\nFAILURES:\n-----------------------"
@@ -75,6 +75,8 @@ $(PATHO)%.o:: $(PATHU)%.c $(PATHU)%.h
 $(PATHD)%.d:: $(PATHT)%.c
 	$(DEPEND) $@ $<
 
+
+
 $(PATHB):
 	$(MKDIR) $(PATHB)
 
@@ -88,9 +90,9 @@ $(PATHR):
 	$(MKDIR) $(PATHR)
 
 
-compile: $(OBJS)
+compile: $(BUILD_PATHS) $(RESULTS)
 
-install: $(OBJS)
+install: compile
 	@$(LINK) -o $(TARGET).$(TARGET_EXTENSION) $(OBJS)
 
 run: install
