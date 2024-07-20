@@ -16,4 +16,4 @@ jobs:
     - name: make
       run: make compile
     - name: make test
-      run: make ctest
+      run: make test
