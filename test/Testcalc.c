@@ -23,7 +23,7 @@ void test_sub()
     TEST_ASSERT_EQUAL(20, out);
     TEST_ASSERT_MESSAGE(out == 32, "something is not firght?:<");
 }
-
+ 
 int main(void)
 {
     UNITY_BEGIN();
