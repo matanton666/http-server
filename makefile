@@ -1,8 +1,14 @@
 
-files := src/main.c
+srcFiles := src/main.c
+incFiles := src/include/tmp.h
 
-all: $(files)
-	gcc $(files) -o server
+all: $(srcFiles) $(incFiles)
+	gcc $(srcFiles) $(incFiles) -o server
+
+
+run: all
+	./server
+
 
 clean:
 	rm server
