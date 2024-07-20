@@ -17,7 +17,7 @@ int mul(int x, int y)
     return result >= INT_MAX || result <= INT_MIN ? -1 : (int)result;
 }
 
-int div(int x, int y)
+int divide(int x, int y)
 {
     return (y == 0) ? 0 : x / y;
 }

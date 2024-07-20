@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
     printf("'10 + 2 = %d'\n", add(10, 2));
     printf("'10 - 2 = %d'\n", sub(10, 2));
     printf("'10 * 2 = %d'\n", mul(10, 2));
-    printf("'10 / 2 = %d'\n", div(10, 2));
+    printf("'10 / 2 = %d'\n", divide(10, 2));
     printf("'10 %% 2 = %d'\n", mod(10, 2));
     printf("'10 power two = %d'\n", power_two(10));
     printf("'10 power three = %d'\n", power(10, 3));
