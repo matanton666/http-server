@@ -14,7 +14,10 @@ void* client_chat(void* client_data);
 int main(int argc, char *argv[])
 {
 
-    int soc_descript = create_local_socket(1234);
+    int soc_descript = bind_local_socket(1234);
+    if (soc_descript < 0) {
+        return -1;
+    }
     accept_loop(soc_descript, (void*)client_chat);
 
     return 0;

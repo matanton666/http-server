@@ -13,6 +13,9 @@
 #include <string.h>
 #include <time.h>
 
+#define CHECK_AZ(x, ms, ret) if (x < 0) {perror(ms); return ret;} // check if x is above 0 and return ret if not
+
+
 
 typedef struct client_data_t
 {
@@ -23,7 +26,10 @@ typedef struct client_data_t
 
 // creates and binds socket on selected port for localhost 
 // returns the socket descriptor
-int create_local_socket(uint16_t port);
+int bind_local_socket(uint16_t port);
+
+// start listening on socket with max connections 
+int socket_start_listen(int socket_desc, int max_conns);
 
 // using a created socket to make an accept loop that will send clients
 // to seaprate threads using callback function

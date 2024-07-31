@@ -15,7 +15,7 @@ void test_add()
 {
     int output = add(10, 20);
     TEST_ASSERT_EQUAL_MESSAGE(30, output, "this is an output");
-        }
+}
 
 void test_sub()
 {
