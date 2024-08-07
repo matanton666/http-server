@@ -28,6 +28,9 @@ int bind_local_socket(uint16_t port)
 
 int socket_start_listen(int socket_desc, int max_conns)
 {
+    if (max_conns <= 0) {
+        return -1;
+    }
     CHECK_AZ(listen(socket_desc, max_conns), "could not listen on socket port", -1);
     return 0;
 }
@@ -37,7 +40,6 @@ int accept_loop(int socket_desc, void* (*client_handler)(void*))
     struct sockaddr_in tmp_client;
     unsigned int addr_len = sizeof(tmp_client);
 
-    CHECK_AZ(socket_start_listen(socket_desc, 5), "listen failed", -1);
 
     while (true) {
         // accept client connection 
@@ -66,7 +68,6 @@ int accept_loop(int socket_desc, void* (*client_handler)(void*))
         printf("client connected: %d", client_desc);
 
         sleep(1);
-        // todo:  make tests for functions
 
     }
     return 0;

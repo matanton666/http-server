@@ -32,7 +32,7 @@ int bind_local_socket(uint16_t port);
 int socket_start_listen(int socket_desc, int max_conns);
 
 // using a created socket to make an accept loop that will send clients
-// to seaprate threads using callback function
+//to seaprate threads using callback function
 int accept_loop(int socket_desc, void* (*client_handler)(void*) );
 
 void check_error(int return_code, const char* msg);
