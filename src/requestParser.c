@@ -12,6 +12,10 @@ http_version get_req_http_version(char *req)
             // validate that there is http/1.
             if (strncmp(search, req + curr, strlen(search)) == 0) {
                 curr += strlen(search);
+                if (*(req + curr + 1) != '\n') { // search for enter after 
+                    return V_INVALID;
+                }
+
                 switch (*(req + curr)) {
                     case '0':
                         return V_ZERO;
@@ -32,16 +36,18 @@ http_version get_req_http_version(char *req)
 
 request_type get_req_type(char *req)
 {
-    if (strncmp("GET", req, 3)) {
+    while (*req == ' ') {req++;}  // remove trailing whitespaces
+
+    if (strncmp("GET", req, 3) == 0) {
         return REQ_GET;
     }
-    else if (strncmp("POST", req, 4)) {
+    else if (strncmp("POST", req, 4) == 0) {
         return REQ_POST;
     }
-    else if (strncmp("DELETE", req, 6)) {
+    else if (strncmp("DELETE", req, 6) == 0) {
         return REQ_DELETE;
     }
-    else if (strncmp("PUT", req, 3)) {
+    else if (strncmp("PUT", req, 3) == 0) {
         return REQ_PUT;
     }
     return REQ_INVALID;
@@ -50,7 +56,7 @@ request_type get_req_type(char *req)
 
 url_t parse_req_url(char *req)
 {
-       
+
 }
 
 
