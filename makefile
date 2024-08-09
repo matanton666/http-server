@@ -49,13 +49,13 @@ IGNORE = `grep -s IGNORE $(PATHR)*.txt`
 all: test
 
 test: compile
-	@echo -e "-----------------------\nIGNORES:\n-----------------------"
+	@echo -e "-----------------------\nIGNORES:\n"
 	@echo -e "$(IGNORE)"
-	@echo -e "-----------------------\nFAILURES:\n-----------------------"
-	@echo -e "$(FAIL)"
-	@echo -e "-----------------------\nPASSED:\n-----------------------"
+	@echo -e "-----------------------\nPASSED:\n"
 	@echo -e "$(PASSED)"
-	@echo -e "\nDONE"
+	@echo -e "-----------------------\nFAILURES:\n"
+	@echo -e "$(FAIL)"
+	@echo -e "-----------------------\nDONE"
 
 $(PATHR)%.txt: $(PATHB)%.$(TARGET_EXTENSION)
 	-./$< > $@ 2>&1
