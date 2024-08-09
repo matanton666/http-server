@@ -9,10 +9,11 @@
 
 
 typedef enum request_type {
-    GET,
-    POST,
-    PUT,
-    DELETE
+    REQ_GET,
+    REQ_POST,
+    REQ_PUT,
+    REQ_DELETE,
+    REQ_INVALID
 }request_type;
 
 typedef enum http_version {

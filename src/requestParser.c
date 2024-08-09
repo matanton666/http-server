@@ -30,3 +30,28 @@ http_version get_req_http_version(char *req)
 }
 
 
+request_type get_req_type(char *req)
+{
+    if (strncmp("GET", req, 3)) {
+        return REQ_GET;
+    }
+    else if (strncmp("POST", req, 4)) {
+        return REQ_POST;
+    }
+    else if (strncmp("DELETE", req, 6)) {
+        return REQ_DELETE;
+    }
+    else if (strncmp("PUT", req, 3)) {
+        return REQ_PUT;
+    }
+    return REQ_INVALID;
+}
+
+
+url_t parse_req_url(char *req)
+{
+       
+}
+
+
+
