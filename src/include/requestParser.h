@@ -3,7 +3,10 @@
 
 
 #include "socketHandler.h"
-#include <strings.h>
+#include "hashTable.h"
+
+#include <string.h>
+#include <regex.h>
 
 
 
@@ -35,7 +38,7 @@ typedef struct request_t {
     http_version version;
     request_type req_type;
     url_t url;
-    char* headers; // todo: create seprate struct or enum or list or something for this
+    HashTable* headers;
     char* data;
 }request_t;
 
@@ -61,6 +64,21 @@ sec-ch-ua-platform: "Linux"
 DNT: 1
 Upgrade-Insecure-Requests: 1
 User-Agen����n
+
+this is data
+
+
+
+POST /api/users HTTP/1.1
+Host: example.com
+Content-Type: application/json
+Content-Length: 49
+
+{
+  "name": "John Doe",
+  "email": "john.doe@example.com"
+}
+
 */
 
 
@@ -68,6 +86,7 @@ User-Agen����n
 
 http_version get_req_http_version(char* req);
 request_type get_req_type(char* req);
+HashTable* parse_req_headers(char* req);// todo: need regex validation before running this function
 url_t parse_req_url(char* req);
 
 

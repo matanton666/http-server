@@ -1,6 +1,5 @@
 #include "../unity/src/unity.h"
 #include "../src/include/requestParser.h"
-#include <stdio.h>
 
 char st[] = "DELETE /item/902 HTTP/1.1\nHost: 127.0.0.1:1234\nConnection: keep-alive";
 
@@ -96,6 +95,10 @@ void testRequestType() {
 }
 
 
+void testHeadersParser() 
+{
+
+}
  
 int main(void)
 {

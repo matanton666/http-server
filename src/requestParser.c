@@ -1,6 +1,5 @@
 
 #include "include/requestParser.h"
-#include <string.h>
 
 http_version get_req_http_version(char *req)
 {
@@ -54,10 +53,38 @@ request_type get_req_type(char *req)
 }
 
 
-url_t parse_req_url(char *req)
-{
 
+HashTable* parse_req_headers(char* req)
+{
+    HashTable* headers = create_table();
+    req = strdup(req);
+    char* pos = req;
+
+    while (*pos != '\n') {  // skip request line
+        pos++;
+    }
+    pos++;
+
+    while (*pos && *(pos++) && *pos != '\n' && *(pos++) != '\n') { // untill get to data part
+        // isolate key
+        char* colon = strstr(pos, ": ");
+        *colon = '\0';
+        char* key = pos;
+
+        // isolate value
+        char* value = colon + 2;
+        pos = strchr(pos, '\n');
+        *pos = '\0';
+
+        insert(headers, key, value);
+        pos++;
+    }
+
+
+    free(req);
+    return headers;
 }
+
 
 
 
