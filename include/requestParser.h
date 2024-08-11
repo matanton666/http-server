@@ -6,6 +6,7 @@
 #include "hashTable.h"
 
 #include <string.h>
+#include <stdio.h>
 #include <regex.h>
 
 

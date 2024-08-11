@@ -1,4 +1,4 @@
-#include "include/hashTable.h"
+#include "../../include/hashTable.h"
 
 // Hash function to generate index
 unsigned int hash(const char* key) {

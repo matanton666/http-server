@@ -1,4 +1,4 @@
-#include "include/socketHandler.h"
+#include "../../include/socketHandler.h"
 #include <pthread.h>
 
 int bind_local_socket(uint16_t port)

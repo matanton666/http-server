@@ -5,8 +5,8 @@
 #include <strings.h>
 #include <unistd.h>
 
-#include "include/socketHandler.h"
-#include "include/requestParser.h"
+#include "../include/socketHandler.h"
+#include "../include/requestParser.h"
 
 
 void* client_chat(void* client_data);
