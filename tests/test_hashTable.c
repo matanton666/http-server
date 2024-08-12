@@ -1,5 +1,16 @@
 #include "../include/hashTable.h"
-#include <assert.h>
+#include "unity.h"
+
+void setUp() 
+{
+
+}
+
+void tearDown()
+{
+
+}
+
 
 void test_insert_and_search(void) {
     HashTable* hashTable = create_table();
@@ -8,12 +19,11 @@ void test_insert_and_search(void) {
     insert(hashTable, "key2", "200");
     insert(hashTable, "key3", "300");
 
-    assert(strcmp(search(hashTable, "key1"), "100") == 0);
-    assert(strcmp(search(hashTable, "key2"), "200") == 0);
-    assert(strcmp(search(hashTable, "key3"), "300") == 0);
+    TEST_ASSERT_EQUAL_STRING("100", search(hashTable, "key1"));
+    TEST_ASSERT_EQUAL_STRING("200", search(hashTable, "key2"));
+    TEST_ASSERT_EQUAL_STRING("300", search(hashTable, "key3"));
 
     free_table(hashTable);
-    printf("test_insert_and_search passed!\n");
 }
 
 void test_search_non_existent_key(void) {
@@ -21,23 +31,21 @@ void test_search_non_existent_key(void) {
 
     insert(hashTable, "key1", "100");
 
-    assert(search(hashTable, "key2") == NULL); // Should return NULL for non-existent key
+    TEST_ASSERT_NULL(search(hashTable, "key2")); // Should return NULL for non-existent key
 
     free_table(hashTable);
-    printf("test_search_non_existent_key passed!\n");
 }
 
 void test_update_existing_key(void) {
     HashTable* hashTable = create_table();
 
     insert(hashTable, "key1", "100");
-    assert(strcmp(search(hashTable, "key1"), "100") == 0);
+    TEST_ASSERT_EQUAL_STRING("100", search(hashTable, "key1"));
 
     insert(hashTable, "key1", "500"); // Update value
-    assert(strcmp(search(hashTable, "key1"), "500") == 0);
+    TEST_ASSERT_EQUAL_STRING("500", search(hashTable, "key1"));
 
     free_table(hashTable);
-    printf("test_update_existing_key passed!\n");
 }
 
 void test_delete_key(void) {
@@ -47,12 +55,11 @@ void test_delete_key(void) {
     insert(hashTable, "key2", "200");
 
     delete_node(hashTable, "key1");
-    assert(search(hashTable, "key1") == NULL); // Should return NULL after deletion
+    TEST_ASSERT_NULL(search(hashTable, "key1")); // Should return NULL after deletion
 
-    assert(strcmp(search(hashTable, "key2"), "200") == 0); // Ensure other keys are unaffected
+    TEST_ASSERT_EQUAL_STRING("200", search(hashTable, "key2")); // Ensure other keys are unaffected
 
     free_table(hashTable);
-    printf("test_delete_key passed!\n");
 }
 
 void test_insert_multiple_keys_with_same_hash(void) {
@@ -62,19 +69,20 @@ void test_insert_multiple_keys_with_same_hash(void) {
     insert(hashTable, "a", "asdf");
     insert(hashTable, "k", "wert"); // Assuming 'a' and 'k' hash to the same index
 
-    assert(strcmp(search(hashTable, "a"), "asdf") == 0);
-    assert(strcmp(search(hashTable, "k"), "wert") == 0);
+    TEST_ASSERT_EQUAL_STRING("asdf", search(hashTable, "a"));
+    TEST_ASSERT_EQUAL_STRING("wert", search(hashTable, "k"));
 
     free_table(hashTable);
-    printf("test_insert_multiple_keys_with_same_hash passed!\n");
 }
 
 int main(void) {
-    test_insert_and_search();
-    test_search_non_existent_key();
-    test_update_existing_key();
-    test_delete_key();
-    test_insert_multiple_keys_with_same_hash();
+    UNITY_BEGIN();
 
-    return 0;
+    RUN_TEST(test_insert_and_search);
+    RUN_TEST(test_search_non_existent_key);
+    RUN_TEST(test_update_existing_key);
+    RUN_TEST(test_delete_key);
+    RUN_TEST(test_insert_multiple_keys_with_same_hash);
+
+    return UNITY_END();
 }

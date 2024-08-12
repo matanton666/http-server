@@ -51,9 +51,18 @@ add_library(${PROJECT_NAME}_lib
 
 # Add main executable
 add_executable(${PROJECT_NAME} src/main.c)
-target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}_lib)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_lib)
 
-# Enable testing;
+
+include(FetchContent)
+FetchContent_Declare(
+  unity
+  GIT_REPOSITORY https://github.com/ThrowTheSwitch/Unity.git
+  GIT_TAG        v2.5.2
+)
+FetchContent_MakeAvailable(unity)
+
+
 enable_testing()
 
 # Add tests
