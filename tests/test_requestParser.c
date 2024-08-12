@@ -1,4 +1,5 @@
 #include "../include/requestParser.h"
+#include "../include/hashTable.h"
 #include <assert.h>
 #include <stdio.h>
 
@@ -7,23 +8,23 @@ void testGetHttpVersion() {
     char st[] = "DELETE /item/902 HTTP/1.1\nHost: 127.0.0.1:1234\nConnection: keep-alive";
     printf("got here****************************************");
     assert(get_req_http_version(st) == V_ONE);
-    // st[24] = '2';
-    // assert(get_req_http_version(st) == V_TWO);
-    // st[24] = '4';
-    // assert(get_req_http_version(st) == V_INVALID);
-    // assert(get_req_http_version("asd asdf asdf asdfasdfffdf") == V_INVALID);
-    // assert(get_req_http_version("asd asdf asdf\n asdfasdfffdf") == V_INVALID);
+    st[24] = '2';
+    assert(get_req_http_version(st) == V_TWO);
+    st[24] = '4';
+    assert(get_req_http_version(st) == V_INVALID);
+    assert(get_req_http_version("asd asdf asdf asdfasdfffdf") == V_INVALID);
+    assert(get_req_http_version("asd asdf asdf\n asdfasdfffdf") == V_INVALID);
 
-    // assert(get_req_http_version(NULL) == V_INVALID);
-    // assert(get_req_http_version("") == V_INVALID);
-    // assert(get_req_http_version("   ") == V_INVALID);
-    // assert(get_req_http_version("HTTP/1.1 GET /path") == V_ONE);
-    // assert(get_req_http_version("GET /path HTTP/1.1") == V_ONE);
-    // assert(get_req_http_version("HTTP/1.1 GET /path HTTP/1.0") == V_ONE);
-    // assert(get_req_http_version("HTTP/-1.1") == V_INVALID);
-    // assert(get_req_http_version("HTTP/1.5") == V_INVALID);
+    assert(get_req_http_version(NULL) == V_INVALID);
+    assert(get_req_http_version("") == V_INVALID);
+    assert(get_req_http_version("   ") == V_INVALID);
+    assert(get_req_http_version("HTTP/1.1 GET /path") == V_ONE);
+    assert(get_req_http_version("GET /path HTTP/1.1") == V_ONE);
+    assert(get_req_http_version("HTTP/1.1 GET /path HTTP/1.0") == V_ONE);
+    assert(get_req_http_version("HTTP/-1.1") == V_INVALID);
+    assert(get_req_http_version("HTTP/1.5") == V_INVALID);
 
-    // printf("testGetHttpVersion passed!\n");
+    printf("testGetHttpVersion passed!\n");
 }
 
 void testRequestType() {
@@ -57,14 +58,18 @@ void testRequestType() {
 }
 
 void testHeadersParser() {
-    return;
-    // No test cases provided
+    char req[] = "POST /api/users HTTP/1.1\nHost: example.com\nContent-Type: application/json\nContent-Length: 49\n\n{\n  'name': 'John Doe',\n  'email': 'john.doe@example.com'\n}";
+    HashTable* tbl = parse_req_headers(req);
+
+    assert(strcmp(search(tbl, "Host"), "example.com") == 0);
+    assert(strcmp(search(tbl, "Content-Type"), "application/json") == 0);
+    assert(strcmp(search(tbl, "Content-Length"), "49") == 0);
 }
 
 int main(void) {
-    // testGetHttpVersion();
-    // testRequestType();
-    testHeadersParser();
+    testGetHttpVersion();
+    testRequestType();
+    // testHeadersParser();
 
     return 0;
 }

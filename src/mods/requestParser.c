@@ -1,22 +1,21 @@
 
 #include "../../include/requestParser.h"
-#include <stdio.h>
 
 
 http_version get_req_http_version(char *req)
 {
 
     char search[] = "HTTP/1.";
-    printf("asdfasdfasdfsdff");
     
     if (!req || strlen(req) <= strlen(search)+1) return V_INVALID; // make sure req is at least the right size
     
     char* http = strstr(req, search);
+    if (!http) return V_INVALID;
+
     http += strlen(search);
-    if (*(http + 1) != '\0')
+    if (*(http) != '\0')
     {
-        printf("***************** %c ************", *(http + 1) );
-        switch (*(http+1)) {
+        switch (*(http)) {
             case '0':
                 return V_ZERO;
             case '1':
@@ -27,30 +26,15 @@ http_version get_req_http_version(char *req)
                 return V_INVALID;
         }
     }
-
-
-    // int curr = 0;
-
-    // while (curr < strlen(req) && req[curr] != '\n') {
-    //     if (req[curr] == search[0]){
-    //         // validate that there is http/1.
-    //         if (strncmp(search, req + curr, strlen(search)) == 0) {
-    //             curr += strlen(search);
-    //             if (*(req + curr + 1) != '\n') { // search for enter after 
-    //                 return V_INVALID;
-    //             }
-
-       
-    //         }
-    //     }
-    //     curr++;
-    // }
+ 
     return V_INVALID;
 }
 
 
 request_type get_req_type(char *req)
 {
+    if (!req) return REQ_INVALID;
+
     while (*req == ' ') {req++;}  // remove trailing whitespaces
 
     if (strncmp("GET", req, 3) == 0) {
