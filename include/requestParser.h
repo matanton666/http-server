@@ -84,10 +84,21 @@ Content-Length: 49
 
 
 
+int validate_req_syntax(char* req);
 
+
+// expects valid http request
 http_version get_req_http_version(char* req);
+
+
 request_type get_req_type(char* req);
-HashTable* parse_req_headers(char* req);// todo: need regex validation before running this function
+
+HashTable* validate_headers(HashTable* tbl);
+
+// expects a valid http request
+HashTable* parse_req_headers(char* req);
+
+
 url_t parse_req_url(char* req);
 
 

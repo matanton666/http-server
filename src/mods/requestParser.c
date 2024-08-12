@@ -56,7 +56,10 @@ request_type get_req_type(char *req)
 
 HashTable* parse_req_headers(char* req)
 {
+
     HashTable* headers = create_table();
+    if (!headers || !req) return NULL;
+
     char* tmp = strdup(req);
     char* pos = tmp;
 
@@ -65,15 +68,18 @@ HashTable* parse_req_headers(char* req)
     }
     pos++;
 
-    while (*pos && *(pos++) && *pos != '\n' && *(pos++) != '\n') { // untill get to data part
+    while ((*pos && *(pos+1)) && (pos && pos+1) && (*pos != '\n' && *(pos+1) != '\n')) { // untill get to data part
         // isolate key
         char* colon = strstr(pos, ": ");
+        if (!colon) return NULL;
         *colon = '\0';
         char* key = pos;
 
         // isolate value
-        char* value = colon + 2;
+        char* value = colon + 2; // skip colon and space
+        pos = value;
         pos = strchr(pos, '\n');
+        if (!pos || !value) return NULL;
         *pos = '\0';
 
         insert(headers, key, value);
@@ -87,4 +93,48 @@ HashTable* parse_req_headers(char* req)
 
 
 
+// Function to validate HTTP/1.* request
+int validate_req_syntax(char* req)
+{
+    regex_t regex;
+    char msgbuf[100];
+    int reti;
+    
+    if (!req || !(*req)) return false;
 
+    // Sufficiently large buffer for the pattern
+    char pattern[120] = "^(GET|POST|PUT|DELETE|HEAD|OPTIONS|TRACE|CONNECT) (/|/[^ ]+) HTTP/1\.[0-9]\n([A-Za-z0-9-]+: .+\n)*$";
+
+    char *has_body = strstr(req, "\n\n");
+    if (has_body) {
+        strncpy(pattern, "^(GET|POST|PUT|DELETE|HEAD|OPTIONS|TRACE|CONNECT) (/|/[^ ]+) HTTP/1\.[0-9]\n([A-Za-z0-9-]+: .+\n)*\n(.*\n*)*", sizeof(pattern) - 1);
+        pattern[sizeof(pattern) - 1] = '\0';  // Ensure null-termination
+    }
+
+
+    // Compile regex
+    reti = regcomp(&regex, pattern, REG_EXTENDED | REG_NEWLINE);
+    if (reti != 0) {
+        regerror(reti, &regex, msgbuf, sizeof(msgbuf));
+        printf("Regex error compiling '%s': %s\n", pattern, msgbuf);
+        return false;
+    }
+
+    // Execute regex
+    reti = regexec(&regex, req, 0, NULL, 0);
+    if (!reti) {
+        regfree(&regex);
+        return true;
+    } 
+    else if (reti == REG_NOMATCH) {
+        // printf("HTTP request is not valid.\n");
+        regfree(&regex);
+        return false;
+    } 
+    else {
+        regerror(reti, &regex, msgbuf, sizeof(msgbuf));
+        fprintf(stderr, "Regex match failed: %s\n", msgbuf);
+        regfree(&regex);
+        return false;
+    }
+}
