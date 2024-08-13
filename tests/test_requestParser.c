@@ -96,12 +96,6 @@ void testHeadersParser() {
     HashTable* tbl4 = parse_req_headers(req4);
     TEST_ASSERT_EQUAL_STRING_MESSAGE("application/json", search(tbl4, "Content-type"), "Failed to get Content-Type header value");
     free_table(tbl4);
-
-    // // Test case with leading/trailing whitespace in header values
-    // char req5[] = "POST /api/users HTTP/1.1\nHost:   example.com   \nContent-Type: application/json\nContent-Length: 49\n\n{\n  'name': 'John Doe',\n  'email': 'john.doe@example.com'\n}";
-    // HashTable* tbl5 = parse_req_headers(req5);
-    // TEST_ASSERT_EQUAL_STRING_MESSAGE("example.com", search(tbl5, "Host"), "Failed to trim whitespace from header value");
-    // free_table(tbl5);
 }
 
 

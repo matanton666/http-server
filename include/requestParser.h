@@ -83,7 +83,8 @@ Content-Length: 49
 */
 
 
-
+// only validates that the syntax is correct
+// does not check if headers correct or match request type or anything like that
 int validate_req_syntax(char* req);
 
 
@@ -93,12 +94,12 @@ http_version get_req_http_version(char* req);
 
 request_type get_req_type(char* req);
 
-HashTable* validate_headers(HashTable* tbl);
 
 // expects a valid http request
 HashTable* parse_req_headers(char* req);
 
 
+// expects a valid http request
 url_t parse_req_url(char* req);
 
 

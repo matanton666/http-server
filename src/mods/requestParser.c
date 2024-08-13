@@ -93,7 +93,6 @@ HashTable* parse_req_headers(char* req)
 
 
 
-// Function to validate HTTP/1.* request
 int validate_req_syntax(char* req)
 {
     regex_t regex;
@@ -137,4 +136,10 @@ int validate_req_syntax(char* req)
         regfree(&regex);
         return false;
     }
+}
+
+
+url_t parse_req_url(char* req)
+{
+    // todo: implement
 }
