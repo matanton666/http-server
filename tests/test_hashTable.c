@@ -13,7 +13,7 @@ void tearDown()
 
 
 void test_insert_and_search(void) {
-    HashTable* hashTable = create_table();
+    hash_table_t* hashTable = create_table();
 
     insert(hashTable, "key1", "100");
     insert(hashTable, "key2", "200");
@@ -27,7 +27,7 @@ void test_insert_and_search(void) {
 }
 
 void test_search_non_existent_key(void) {
-    HashTable* hashTable = create_table();
+    hash_table_t* hashTable = create_table();
 
     insert(hashTable, "key1", "100");
 
@@ -37,7 +37,7 @@ void test_search_non_existent_key(void) {
 }
 
 void test_update_existing_key(void) {
-    HashTable* hashTable = create_table();
+    hash_table_t* hashTable = create_table();
 
     insert(hashTable, "key1", "100");
     TEST_ASSERT_EQUAL_STRING("100", search(hashTable, "key1"));
@@ -49,7 +49,7 @@ void test_update_existing_key(void) {
 }
 
 void test_delete_key(void) {
-    HashTable* hashTable = create_table();
+    hash_table_t* hashTable = create_table();
 
     insert(hashTable, "key1", "100");
     insert(hashTable, "key2", "200");
@@ -63,7 +63,7 @@ void test_delete_key(void) {
 }
 
 void test_insert_multiple_keys_with_same_hash(void) {
-    HashTable* hashTable = create_table();
+    hash_table_t* hashTable = create_table();
 
     // Insert keys that would hash to the same index (assuming a simple hash function)
     insert(hashTable, "a", "asdf");

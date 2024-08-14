@@ -10,8 +10,8 @@ unsigned int hash(const char* key) {
 }
 
 // Create a new node
-Node* create_node(const char* key, char* value) {
-    Node* newNode = (Node*)malloc(sizeof(Node));
+node_t* create_node(const char* key, char* value) {
+    node_t* newNode = (node_t*)malloc(sizeof(node_t));
     newNode->key = strdup(key);
     newNode->value = value;
     newNode->next = NULL;
@@ -19,16 +19,16 @@ Node* create_node(const char* key, char* value) {
 }
 
 // Insert key-value pair into hash table
-void insert(HashTable* hashTable, const char* key, char* value) {
+void insert(hash_table_t* hashTable, const char* key, char* value) {
     unsigned int index = hash(key);
-    Node* newNode = create_node(key, value);
-    Node* head = hashTable->table[index];
+    node_t* newNode = create_node(key, value);
+    node_t* head = hashTable->table[index];
 
     if (head == NULL) {
         hashTable->table[index] = newNode;
     } else {
-        Node* current = head;
-        Node* prev = NULL;
+        node_t* current = head;
+        node_t* prev = NULL;
         while (current != NULL) {
             if (strcmp(current->key, key) == 0) {
                 current->value = value; // Update value if key already exists
@@ -44,9 +44,9 @@ void insert(HashTable* hashTable, const char* key, char* value) {
 }
 
 // Search for a key in the hash table
-char* search(HashTable* hashTable, const char* key) {
+char* search(hash_table_t* hashTable, const char* key) {
     unsigned int index = hash(key);
-    Node* current = hashTable->table[index];
+    node_t* current = hashTable->table[index];
 
     while (current != NULL) {
         if (strcmp(current->key, key) == 0) {
@@ -58,10 +58,10 @@ char* search(HashTable* hashTable, const char* key) {
 }
 
 // Remove a key-value pair from the hash table
-void delete_node(HashTable* hashTable, const char* key) {
+void delete_node(hash_table_t* hashTable, const char* key) {
     unsigned int index = hash(key);
-    Node* current = hashTable->table[index];
-    Node* prev = NULL;
+    node_t* current = hashTable->table[index];
+    node_t* prev = NULL;
 
     while (current != NULL && strcmp(current->key, key) != 0) {
         prev = current;
@@ -83,8 +83,8 @@ void delete_node(HashTable* hashTable, const char* key) {
 }
 
 // Initialize hash table
-HashTable* create_table() {
-    HashTable* hashTable = (HashTable*)malloc(sizeof(HashTable));
+hash_table_t* create_table() {
+    hash_table_t* hashTable = (hash_table_t*)malloc(sizeof(hash_table_t));
     for (int i = 0; i < TABLE_SIZE; i++) {
         hashTable->table[i] = NULL;
     }
@@ -92,11 +92,11 @@ HashTable* create_table() {
 }
 
 // Free memory of the hash table
-void free_table(HashTable* hashTable) {
+void free_table(hash_table_t* hashTable) {
     for (int i = 0; i < TABLE_SIZE; i++) {
-        Node* current = hashTable->table[i];
+        node_t* current = hashTable->table[i];
         while (current != NULL) {
-            Node* temp = current;
+            node_t* temp = current;
             current = current->next;
             free(temp->key);
             free(temp);

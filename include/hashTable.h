@@ -11,34 +11,34 @@
 #define TABLE_SIZE 5
 
 // Node structure for the linked list in each hash table bucket
-typedef struct Node {
+typedef struct node_t {
     char* key;
     char* value;
-    struct Node* next;
-} Node;
+    struct node_t* next;
+} node_t;
 
 // Hash table structure
-typedef struct HashTable {
-    Node* table[TABLE_SIZE];
-} HashTable;
+typedef struct hash_table_t {
+    node_t* table[TABLE_SIZE];
+} hash_table_t;
 
 
 
 
 // create a new hash table
-HashTable* create_table(void);
+hash_table_t* create_table(void);
 
 // insert a key-value pair into the hash table
-void insert(HashTable* hashTable, const char* key, char* value);
+void insert(hash_table_t* hashTable, const char* key, char* value);
 
 // search for a value by key in the hash table
 // returns null if not found
-char* search(HashTable* hashTable, const char* key);
+char* search(hash_table_t* hashTable, const char* key);
 
 // delete a key-value pair from the hash table
-void delete_node(HashTable* hashTable, const char* key);
+void delete_node(hash_table_t* hashTable, const char* key);
 
 // free the memory used by the hash table
-void free_table(HashTable* hashTable);
+void free_table(hash_table_t* hashTable);
 
 #endif // HASHTABLE_H

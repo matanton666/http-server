@@ -65,7 +65,7 @@ void testRequestType() {
 
 void testHeadersParser() {
     char req[] = "POST /api/users HTTP/1.1\nHost: example.com\nContent-Type: application/json\nContent-Length: 49\n\n{\n  'name': 'John Doe',\n  'email': 'john.doe@example.com'\n}";
-    HashTable* tbl = parse_req_headers(req);
+    hash_table_t* tbl = parse_req_headers(req);
 
     TEST_ASSERT_EQUAL_STRING_MESSAGE("example.com", search(tbl, "Host"), "Failed to get Host header value");
     TEST_ASSERT_EQUAL_STRING_MESSAGE("application/json", search(tbl, "Content-Type"), "Failed to get Content-Type header value");
@@ -75,26 +75,26 @@ void testHeadersParser() {
 
     // Test case with empty headers
     char req1[] = "GET / HTTP/1.1\n\n";
-    HashTable* tbl1 = parse_req_headers(req1);
+    hash_table_t* tbl1 = parse_req_headers(req1);
     TEST_ASSERT_NULL_MESSAGE(search(tbl1, "Host"), "Expected NULL for empty headers");
     free_table(tbl1);
 
     // Test case with missing newline after headers
     char req2[] = "POST /api/users HTTP/1.1\nHost: example.com\nContent-Type: application/json\nContent-Length: 49{\n  'name': 'John Doe',\n  'email': 'john.doe@example.com'\n";
-    HashTable* tbl2 = parse_req_headers(req2);
+    hash_table_t* tbl2 = parse_req_headers(req2);
     TEST_ASSERT_EQUAL_STRING(search(tbl2, "Host"), "example.com");
     TEST_ASSERT_EQUAL_STRING(search(tbl2, "  'name'"), "'John Doe',");
     free_table(tbl2);
 
     // Test case with duplicate headers
     char req3[] = "GET / HTTP/1.1\nHost: example.com\nHost: example.org\n\n";
-    HashTable* tbl3 = parse_req_headers(req3);
+    hash_table_t* tbl3 = parse_req_headers(req3);
     TEST_ASSERT_EQUAL_STRING_MESSAGE("example.org", search(tbl3, "Host"), "Expected last duplicate header value");
     free_table(tbl3);
 
     // Test case with mixed casing for header names
     char req4[] = "POST /api/users HTTP/1.1\nHost: example.com\nContent-type: application/json\nContent-Length: 49\n\n{\n  'name': 'John Doe',\n  'email': 'john.doe@example.com'\n}";
-    HashTable* tbl4 = parse_req_headers(req4);
+    hash_table_t* tbl4 = parse_req_headers(req4);
     TEST_ASSERT_EQUAL_STRING_MESSAGE("application/json", search(tbl4, "Content-type"), "Failed to get Content-Type header value");
     free_table(tbl4);
 }
@@ -163,14 +163,14 @@ void test_request_validation()
     // 20. Valid request with an empty line after the headers but before the body
     char req23[] = "POST /api/users HTTP/1.1\nHost: example.com\nContent-Type: application/json\nContent-Length: 49\n\n\n{\"name\":\"John\"}";
     TEST_ASSERT_TRUE(validate_req_syntax(req23)); // Valid despite the extra newline between headers and body
-    
+
 }
 
 
 void test_url_parser()
 {
     char req[] = "POST /api/users HTTP/1.1\nHost: example.com\nContent-Type: application/json\nContent-Length: 49\n\n{\n  'name': 'John Doe}\n  this is some example of possible data";
-    HashTable* tbl = parse_req_headers(req);
+    hash_table_t* tbl = parse_req_headers(req);
     url_t* url = parse_req_url(req, tbl);
     TEST_ASSERT_EQUAL_STRING("example.com/api/users", url->domain);
     TEST_ASSERT_EQUAL_STRING("/api/users", url->path);
@@ -222,7 +222,7 @@ void test_all()
 {
     char req[] = "GET /path?query=value HTTP/1.1\nHost: example.com\nContent-type: application/json\n\n";
     TEST_ASSERT_TRUE(validate_req_syntax(req));
-    HashTable* tbl = parse_req_headers(req);
+    hash_table_t* tbl = parse_req_headers(req);
     TEST_ASSERT_NOT_NULL(tbl);
     url_t* url = parse_req_url(req, tbl);
     TEST_ASSERT_NOT_NULL(url);

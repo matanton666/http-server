@@ -2,7 +2,7 @@
 #include <time.h>
 
 
-http_version get_req_http_version(char *req)
+http_version_t get_req_http_version(char *req)
 {
 
     char search[] = "HTTP/1.";
@@ -31,7 +31,7 @@ http_version get_req_http_version(char *req)
 }
 
 
-request_type get_req_type(char *req)
+request_type_t get_req_type(char *req)
 {
     if (!req) return REQ_INVALID;
 
@@ -54,10 +54,10 @@ request_type get_req_type(char *req)
 
 
 
-HashTable* parse_req_headers(char* req)
+hash_table_t* parse_req_headers(char* req)
 {
 
-    HashTable* headers = create_table();
+    hash_table_t* headers = create_table();
     if (!headers || !req || strlen(req) == 0) return NULL;
 
     char* tmp = strdup(req);
@@ -139,7 +139,7 @@ int validate_req_syntax(char* req)
 }
 
 
-url_t* parse_req_url(char* req, HashTable* headers)
+url_t* parse_req_url(char* req, hash_table_t* headers)
 {
     url_t* url = NULL; 
 
