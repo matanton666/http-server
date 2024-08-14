@@ -1,5 +1,5 @@
-
 #include "../../include/requestParser.h"
+#include <time.h>
 
 
 http_version get_req_http_version(char *req)
@@ -58,7 +58,7 @@ HashTable* parse_req_headers(char* req)
 {
 
     HashTable* headers = create_table();
-    if (!headers || !req) return NULL;
+    if (!headers || !req || strlen(req) == 0) return NULL;
 
     char* tmp = strdup(req);
     char* pos = tmp;
@@ -139,7 +139,43 @@ int validate_req_syntax(char* req)
 }
 
 
-url_t parse_req_url(char* req)
+url_t* parse_req_url(char* req, HashTable* headers)
 {
-    // todo: implement
+    url_t* url = NULL; 
+
+    if (!headers) return NULL;
+    char* host = search(headers, "Host");
+    if (!host) return NULL;
+
+    url = (url_t*)malloc(sizeof(url_t));
+
+    // find request path
+    char* path = strchr(req, '/');
+    if (!path) {
+        free(url);
+        return NULL;
+    }
+    char* path_end = strstr(req, " HTTP/1.");
+    int path_len = path_end - path;
+
+    // create one big string for entire url and make different parts point to certain portions
+    url->domain = (char*)malloc(strlen(host) + path_len); 
+    strcpy(url->domain, host);
+    url->domain_len = strlen(host);
+
+    url->path = url->domain + url->domain_len; 
+    strncpy(url->path, path, path_len);
+    url->path[path_len] = '\0';
+
+    url->query = strchr(url->path, '?'); // will put null if not found
+    if (!url->query){
+        url->query = url->path + path_len; // point query to end of string
+        url->path_len = url->query - url->path;
+    } 
+    else {
+        url->query += 1; // skip '?' before actual querys
+        url->path_len = url->query - url->path - 1; // -1 to accomidate for skipping '?'
+    }
+    
+    return url;
 }

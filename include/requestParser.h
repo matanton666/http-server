@@ -27,12 +27,14 @@ typedef enum http_version {
     V_INVALID
 }http_version;
 
-
+// structured in a way so that domain points to a continues string untill the end of query
 typedef struct url_t {
-    char* subdomain;
     char* domain;
     char* path;
     char* query;
+
+    short domain_len;
+    short path_len;
 }url_t;
 
 typedef struct request_t {
@@ -91,16 +93,18 @@ int validate_req_syntax(char* req);
 // expects valid http request
 http_version get_req_http_version(char* req);
 
-
+// expecst valid http request
 request_type get_req_type(char* req);
 
 
 // expects a valid http request
+// returns null on invalid hedaders or on error
 HashTable* parse_req_headers(char* req);
 
 
-// expects a valid http request
-url_t parse_req_url(char* req);
+// expects a valid http request, mallocs new url_t
+// returns empty url if there are errors
+url_t* parse_req_url(char* req, HashTable* headers);
 
 
 #endif
