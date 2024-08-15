@@ -245,6 +245,66 @@ void test_all()
     TEST_ASSERT_NOT_NULL(url);
     TEST_ASSERT_EQUAL_STRING("query1=value1&query2=value2", url->query);
     
+
+    char requ3[] = "GET /path?query1=value1&query2=value2 HTTP/1.1\nHost: example.com\nContent-type: application/json\n\nthis is some data";
+    request_t* res = parse_request(requ3);
+
+    // Test case 1: Valid request with data
+    char req1[] = "POST /api/users HTTP/1.1\nHost: example.com\nContent-Type: application/json\nContent-Length: 49\n\n{\"name\":\"John Doe\",\"email\":\"john.doe@example.com\"}";
+    request_t* res1 = parse_request(req1);
+    TEST_ASSERT_NOT_NULL(res1);
+    TEST_ASSERT_EQUAL_INT(REQ_POST, res1->type);
+    TEST_ASSERT_EQUAL_INT(V_ONE, res1->version);
+    TEST_ASSERT_EQUAL_STRING("example.com/api/users", res1->url->domain);
+    TEST_ASSERT_EQUAL_STRING("/api/users", res1->url->path);
+    TEST_ASSERT_EQUAL_STRING("", res1->url->query);
+    TEST_ASSERT_EQUAL_STRING("{\"name\":\"John Doe\",\"email\":\"john.doe@example.com\"}", res1->data);
+    free_request_t(res1);
+
+    // Test case 2: Valid request without data
+    char req2[] = "GET /index.html HTTP/1.1\nHost: www.example.com\n\n";
+    request_t* res2 = parse_request(req2);
+    TEST_ASSERT_NOT_NULL(res2);
+    TEST_ASSERT_EQUAL_INT(REQ_GET, res2->type);
+    TEST_ASSERT_EQUAL_INT(V_ONE, res2->version);
+    TEST_ASSERT_EQUAL_STRING("www.example.com/index.html", res2->url->domain);
+    TEST_ASSERT_EQUAL_STRING("/index.html", res2->url->path);
+    TEST_ASSERT_EQUAL_STRING("", res2->url->query);
+    TEST_ASSERT_EQUAL_STRING("", res2->data);
+    free_request_t(res2);
+
+    // Test case 2: Valid request without data
+    char requ2[] = "GET /index.html HTTP/1.1\nHost: www.example.com\n";
+    request_t* resul2 = parse_request(requ2);
+    TEST_ASSERT_NOT_NULL(resul2);
+    TEST_ASSERT_EQUAL_INT(REQ_GET, resul2->type);
+    TEST_ASSERT_EQUAL_INT(V_ONE, resul2->version);
+    TEST_ASSERT_EQUAL_STRING("www.example.com/index.html", resul2->url->domain);
+    TEST_ASSERT_EQUAL_STRING("/index.html", resul2->url->path);
+    TEST_ASSERT_EQUAL_STRING("", resul2->url->query);
+    TEST_ASSERT_NULL(resul2->data);
+    free_request_t(resul2);
+
+
+    // Test case 3: Invalid request (missing HTTP version)
+    char req3[] = "GET /path\nHost: example.com\n\n";
+    request_t* res3 = parse_request(req3);
+    TEST_ASSERT_NULL(res3);
+
+    // Test case 4: Invalid request (unsupported HTTP version)
+    char req4[] = "GET /path HTTP/2.0\nHost: example.com\n\n";
+    request_t* res4 = parse_request(req4);
+    TEST_ASSERT_NULL(res4);
+
+    // Test case 5: Invalid request (missing host header)
+    char req5[] = "GET /path HTTP/1.1\n\n";
+    request_t* res5 = parse_request(req5);
+    TEST_ASSERT_NULL(res5);
+
+    // Test case 6: Invalid request (malformed headers)
+    char req6[] = "GET /path HTTP/1.1\nHost: example.com\nInvalidHeader\n\n";
+    request_t* res6 = parse_request(req6);
+    TEST_ASSERT_NULL(res6);
 }
 
  

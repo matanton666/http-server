@@ -40,12 +40,15 @@ typedef struct url_t {
 typedef struct request_t {
     request_type_t type;
     http_version_t version;
-    url_t url;
+    url_t* url;
     hash_table_t* headers;
     char* data;
 }request_t;
 
 
+// validates, and parses http request
+// returns null if error or not valid
+request_t* parse_request(char* req);
 
 // only validates that the syntax is correct
 // does not check if headers correct or match request type or anything like that
@@ -67,6 +70,9 @@ hash_table_t* parse_req_headers(char* req);
 // expects a valid http request, mallocs new url_t
 // returns empty url if there are errors
 url_t* parse_req_url(char* req, hash_table_t* headers);
+
+
+void free_request_t(request_t* request);
 
 
 #endif

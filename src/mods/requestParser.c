@@ -1,5 +1,54 @@
 #include "../../include/requestParser.h"
-#include <time.h>
+#include <string.h>
+
+request_t* parse_request(char* req)
+{
+    if (!validate_req_syntax(req)) return NULL;
+    
+    request_t* desir_req = (request_t*)malloc(sizeof(request_t)); // deserialized request
+
+    desir_req->type = get_req_type(req);
+    desir_req->version = get_req_http_version(req);
+
+    hash_table_t* headers = parse_req_headers(req);
+    if (!headers) {
+        free(desir_req);
+        return NULL;
+    }
+
+    url_t* url = parse_req_url(req, headers);
+    if (!url) {
+        free(desir_req);
+        free_table(headers);
+        return NULL;
+    }
+
+    desir_req->headers = headers;
+    desir_req->url = url;
+
+    char* data = strstr(req, "\n\n");
+    if (data) {
+        data += 2; // skip 2 \n
+        desir_req->data = (char*)malloc(strlen(data) + 1);
+        strncpy(desir_req->data, data, strlen(data));
+        desir_req->data[strlen(data)] = '\0';
+    }
+    else {
+        desir_req->data = NULL;
+    }
+
+    return desir_req;
+}
+
+void free_request_t(request_t* request)
+{
+    if (request->headers) free_table(request->headers);
+    if (request->url) free(request->url);
+    if (request->data) free(request->data);
+    free(request);
+}
+
+
 
 
 http_version_t get_req_http_version(char *req)
@@ -179,3 +228,4 @@ url_t* parse_req_url(char* req, hash_table_t* headers)
     
     return url;
 }
+

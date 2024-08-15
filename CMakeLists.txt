@@ -5,6 +5,7 @@ project(HttpServer VERSION 1.0)
 # Specify the C standard
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED True)
+set(CMAKE_GENERATOR "Unix Makefiles")
 
 
 
