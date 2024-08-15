@@ -64,7 +64,6 @@ int accept_loop(int socket_desc, void* (*client_handler)(void*))
             printf("count not create thread for client");
             free(data);
         }
-        printf("client connected: %d", client_desc);
 
         sleep(1);
 
