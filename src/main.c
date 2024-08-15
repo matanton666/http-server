@@ -73,7 +73,12 @@ void* client_chat(void* client_data)
         printf("URL: %s\n", req->url->domain);
 
         printf("Headers:\n");
-        printf("%s : %s\n","Host", search(req->headers, "Host"));
+        hash_table_iter* iter = create_iterator(req->headers);
+        do {
+            printf("%s : %s\n",iter->curr->key, iter->curr->value);
+            point_next(iter);
+        }while (has_next(iter)); 
+        free(iter);
 
         if (req->data != NULL) {
             printf("Data:\n%s\n", req->data);

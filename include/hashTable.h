@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-
+#include <stdbool.h>
 
 
 // Define the size of the hash table
@@ -22,8 +22,20 @@ typedef struct hash_table_t {
     node_t* table[TABLE_SIZE];
 } hash_table_t;
 
+typedef struct hash_table_iter {
+    hash_table_t* ht;
+    node_t* curr;
+    int idx;
+}hash_table_iter;
 
+// returns iterator even if table is empty
+// free using regular free()
+hash_table_iter* create_iterator(hash_table_t* tbl);
 
+// returns true or false if has next
+int has_next(hash_table_iter* iter);
+
+void point_next(hash_table_iter* iter);
 
 // create a new hash table
 hash_table_t* create_table(void);
@@ -40,5 +52,8 @@ void delete_node(hash_table_t* hashTable, const char* key);
 
 // free the memory used by the hash table
 void free_table(hash_table_t* hashTable);
+
+
+// todo: add iterator
 
 #endif // HASHTABLE_H

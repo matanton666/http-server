@@ -1,4 +1,5 @@
 #include "../../include/hashTable.h"
+#include <time.h>
 
 // Hash function to generate index
 unsigned int hash(const char* key) {
@@ -105,3 +106,53 @@ void free_table(hash_table_t* hashTable) {
     free(hashTable);
 }
 
+
+
+
+hash_table_iter* create_iterator(hash_table_t* tbl)
+{
+    hash_table_iter* iter = (hash_table_iter*)malloc(sizeof(hash_table_iter));
+
+    iter->ht = tbl;
+    iter->idx = 0;
+    iter->curr = NULL;
+
+    for (; iter->idx < TABLE_SIZE; iter->idx++) {
+        iter->curr = tbl->table[iter->idx];
+        if (iter->curr != NULL) break;
+    }
+
+    return iter;
+}
+
+
+int has_next(hash_table_iter* iter)
+{
+    if (iter->curr == NULL) return false;
+    if (iter->curr->next != NULL) return true;
+
+    node_t* tmp = NULL;
+    for (int i = iter->idx + 1; i < TABLE_SIZE; i++) {
+        tmp = iter->ht->table[i];
+        if (tmp != NULL) return true;
+    }
+
+    return false;
+}
+
+
+
+
+void point_next(hash_table_iter* iter)
+{
+    if (iter->curr == NULL) return;
+    if (iter->curr->next != NULL){
+        iter->curr = iter->curr->next;
+        return;
+    }
+
+    for (iter->idx++; iter->idx < TABLE_SIZE; iter->idx++) {
+        iter->curr = iter->ht->table[iter->idx];
+        if (iter->curr != NULL) break;
+    }
+}
