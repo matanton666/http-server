@@ -22,6 +22,7 @@ typedef struct hash_table_t {
     node_t* table[TABLE_SIZE];
 } hash_table_t;
 
+// use regular free because it just points to existing ht and not copying
 typedef struct hash_table_iter {
     hash_table_t* ht;
     node_t* curr;
@@ -53,7 +54,5 @@ void delete_node(hash_table_t* hashTable, const char* key);
 // free the memory used by the hash table
 void free_table(hash_table_t* hashTable);
 
-
-// todo: add iterator
 
 #endif // HASHTABLE_H

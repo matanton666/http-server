@@ -68,7 +68,7 @@ hash_table_t* parse_req_headers(char* req);
 
 
 // expects a valid http request, mallocs new url_t
-// returns empty url if there are errors
+// returns null if there are errors
 url_t* parse_req_url(char* req, hash_table_t* headers);
 
 

@@ -4,13 +4,15 @@
 #include <string.h>
 #include <strings.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include "../include/socketHandler.h"
 #include "../include/requestParser.h"
 
 
 void* client_chat(void* client_data);
-void remove_char(char* s, char c);
+void remove_char_instances(char* s, char c);
+void print_req(request_t* req);
 
 
 int main(int argc, char *argv[])
@@ -34,9 +36,33 @@ void* client_chat(void* client_data)
     recv(cli_data.client_descriptor, buff, 2048, 0);
     printf("recieved: %s", buff);
 
-    remove_char(buff, '\r');
+    remove_char_instances(buff, '\r');
 
     request_t* req = parse_request(buff);
+    printf("\nreq type: %d\n", req->type);
+    printf("URL: %s\n", req->url->domain);
+    printf("data: \n%s\n", req->data);
+
+
+    // while (true) {
+    //     memset(buff, 0, 256);
+    //     recv(cli_data.client_descriptor, buff, 256, 0);
+    //     printf("%s\nsending: ", buff);
+
+    //     fgets(buff, 256, stdin);
+
+    //     printf("%s\n", buff);
+    //     send(cli_data.client_descriptor, buff, 256, 0);
+    //     printf("client: ");
+    // }
+
+    free(client_data);
+    return NULL;
+}
+
+
+void print_req(request_t* req)
+{
     if (req != NULL) {
         printf("Request Type: ");
         switch (req->type) {
@@ -77,7 +103,7 @@ void* client_chat(void* client_data)
         do {
             printf("%s : %s\n",iter->curr->key, iter->curr->value);
             point_next(iter);
-        }while (has_next(iter)); 
+        }while (has_next(iter));
         free(iter);
 
         if (req->data != NULL) {
@@ -92,28 +118,9 @@ void* client_chat(void* client_data)
     else {
         printf("Invalid request\n");
     }
-
-
-
-
-    // while (true) {
-    //     memset(buff, 0, 256);
-    //     recv(cli_data.client_descriptor, buff, 256, 0);
-    //     printf("%s\nsending: ", buff);
-
-    //     fgets(buff, 256, stdin);
-
-    //     printf("%s\n", buff);
-    //     send(cli_data.client_descriptor, buff, 256, 0);
-    //     printf("client: ");
-    // }
-
-    free(client_data);
-    return NULL;
 }
 
-
-void remove_char(char* s, char c)
+void remove_char_instances(char* s, char c)
 {
  
     int j, n = strlen(s);
