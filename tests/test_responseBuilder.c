@@ -1,6 +1,7 @@
 #include "unity.h"
 #include "../include/responseBuilder.h"
 #include "unity_internals.h"
+#include <string.h>
 
 void setUp(void) {}
 
@@ -10,7 +11,7 @@ void test_build_response_should_create_valid_response_for_200_status_code(void)
 {
     hash_table_t* headers = create_table();
     insert(headers, "Content-Type", "text/html");
-    char* body = "Hello, World!";
+    char* body = strdup("Hello, World!");
 
     response_t* resp = build_response(200, headers, body);
 
@@ -42,7 +43,7 @@ void test_response_to_str_should_convert_response_to_string(void)
     hash_table_t* headers = create_table();
     insert(headers, "Content-Type", "text/html");
     insert(headers, "Content-Length", "12");
-    char* body = "Hello, World";
+    char* body = strdup("Hello, World");
 
     response_t* resp = build_response(200, headers, body);
 
@@ -59,7 +60,7 @@ void test_response_to_str_should_convert_response_to_string(void)
 void test_build_response_should_handle_invalid_status_code(void)
 {
     hash_table_t* headers = create_table();
-    insert(headers, "Content-Type", "text/html");
+    insert(headers, "Content-Type", strdup("text/html"));
 
     response_t* resp = build_response(999, headers, NULL);
 
@@ -73,7 +74,7 @@ void test_build_response_should_handle_invalid_status_code(void)
 
 void test_build_response_should_handle_null_headers(void)
 {
-    response_t* resp = build_response(200, NULL, "Hello, World!");
+    response_t* resp = build_response(200, NULL, strdup("Hello, World!"));
 
     TEST_ASSERT_EQUAL_STRING("200", resp->status_code);
     TEST_ASSERT_EQUAL_STRING("OK", resp->reason_phrase);
@@ -86,7 +87,7 @@ void test_build_response_should_handle_null_headers(void)
 void test_response_to_str_should_handle_null_body(void)
 {
     hash_table_t* headers = create_table();
-    insert(headers, "Content-Type", "text/html");
+    insert(headers, "Content-Type", strdup("text/html"));
 
     response_t* resp = build_response(404, headers, NULL);
 
@@ -101,7 +102,7 @@ void test_response_to_str_should_handle_null_body(void)
 
 void test_response_to_str_should_handle_null_headers(void)
 {
-    response_t* resp = build_response(200, NULL, "Hello, World!");
+    response_t* resp = build_response(200, NULL, strdup("Hello, World!"));
 
     char* expected_response = "HTTP/1.1 200 OK\r\n\r\nHello, World!";
     char* actual_response = response_to_str(resp);
@@ -120,9 +121,8 @@ int main(void)
     RUN_TEST(test_build_response_should_create_valid_response_for_404_status_code);
     RUN_TEST(test_response_to_str_should_convert_response_to_string);
     RUN_TEST(test_response_to_str_should_handle_null_body);
-    // todo: fix tests
-    // RUN_TEST(test_response_to_str_should_handle_null_headers);
-    // RUN_TEST(test_build_response_should_handle_null_headers);
+    RUN_TEST(test_response_to_str_should_handle_null_headers);
+    RUN_TEST(test_build_response_should_handle_null_headers);
 
     return UNITY_END();
 }

@@ -1,5 +1,6 @@
 #include "../../include/responseBuilder.h"
 #include <stdio.h>
+#include <string.h>
 #include <time.h>
 
 
@@ -19,16 +20,18 @@ int response_len(response_t* resp)
     len += 4; // code
     len += strlen(resp->reason_phrase + 2); // +2 for enter
 
-    hash_table_iter* iter = create_iterator(resp->headers);
-    while (iter->curr != NULL){
-        len += strlen(iter->curr->key);
-        len += strlen(iter->curr->value);
-        len += 4; // for ': ' and \r\n
-        point_next(iter);
+    if (resp->headers) {
+        hash_table_iter* iter = create_iterator(resp->headers);
+        while (iter->curr != NULL){
+            len += strlen(iter->curr->key);
+            len += strlen(iter->curr->value);
+            len += 4; // for ': ' and \r\n
+            point_next(iter);
+        }
+        free(iter);
     }
-    free(iter);
 
-    len += 2; // for \r\n\r\n
+    len += 2; // for \r\n
     if (resp->body) {
         len += strlen(resp->body);
     }
@@ -61,20 +64,23 @@ char* response_to_str(response_t* resp)
     tmp = strcpycat(tmp, resp->reason_phrase);
     strncpy(tmp, "\r\n", 2);
     tmp += 2;
+    
+    if (resp->headers) {
 
-    hash_table_iter* iter = create_iterator(resp->headers);
-    while(iter->curr != NULL){
-        tmp = strcpycat(tmp, iter->curr->key);
-        strncpy(tmp, ": ", 2);
-        tmp += 2;
+        hash_table_iter* iter = create_iterator(resp->headers);
+        while(iter->curr != NULL){
+            tmp = strcpycat(tmp, iter->curr->key);
+            strncpy(tmp, ": ", 2);
+            tmp += 2;
 
-        tmp = strcpycat(tmp, iter->curr->value);
-        strncpy(tmp, "\r\n", 2);
-        tmp += 2;
+            tmp = strcpycat(tmp, iter->curr->value);
+            strncpy(tmp, "\r\n", 2);
+            tmp += 2;
 
-        point_next(iter);
-    } 
-    free(iter);
+            point_next(iter);
+        } 
+        free(iter);
+    }
 
     tmp = strcpycat(tmp, "\r\n");
     if (resp->body) {
@@ -128,9 +134,7 @@ response_t* build_response(int status_code, hash_table_t* headers, char* body)
             reason = "Unknown Status";
             break;
     }
-    resp->reason_phrase = malloc(strlen(reason) + 1);
-    strncpy(resp->reason_phrase, reason, strlen(reason) + 1);
-    resp->reason_phrase[strlen(reason) + 1] = '\0';
+    resp->reason_phrase = strdup(reason);
 
     resp->headers = headers;
     resp->body = body;
@@ -147,8 +151,8 @@ void free_response(response_t* resp)
     if (resp->headers) {
         free_table(resp->headers);
     }
-    else if (resp->body) {
-        free(resp->body);
+    if (resp->body && *(resp->body)) {
+            free(resp->body);
     }
     free(resp);
 }

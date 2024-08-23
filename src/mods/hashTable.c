@@ -111,6 +111,8 @@ void free_table(hash_table_t* hashTable) {
 
 hash_table_iter* create_iterator(hash_table_t* tbl)
 {
+    if (!tbl) return NULL;
+
     hash_table_iter* iter = (hash_table_iter*)malloc(sizeof(hash_table_iter));
 
     iter->ht = tbl;
