@@ -1,49 +1,33 @@
 #include "../../include/requestHandler.h"
-
-#include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
-#include <time.h>
 
+char* res_file =  "../res\0";
 
 
 response_t* handle_get(request_t* req)
 {
-    char* file_name = strndup(req->url->path + 1, req->url->path_len - 1);
+    // make sure file name is ../res/*
+    char* file_name = malloc(strlen(res_file) + req->url->path_len);
+    strcpy(file_name, res_file);
+    strncat(file_name, req->url->path, req->url->path_len);
 
-    if (strlen(file_name) == 0) { 
-        // todo: send redirect to index.html
-        file_name = "index.html";
+    if (strlen(file_name) == strlen(res_file)) { 
+        // todo: redirect
+        strcat(file_name, "/index.html");
     }
 
-    FILE* f = fopen(file_name, "rb");
-    if (!f) {
-        // todo: return 404
+    char* buff = read_file(file_name);
+    if (!buff) {
         free(file_name);
-        return NULL;
+        return build_404();
     }
-    free(file_name);
-
-    // get file len
-    fseek(f, 0, SEEK_END);
-    int len = ftell(f);
-    rewind(f);
-    // read to buff
-    char* buff = malloc(len + 1);
-    fread(buff, 1, len, f);
-    buff[len] = '\0';
 
     hash_table_t* headers = create_table();
-    char* len_str = malloc(10);
-    sprintf(len_str, "%d", len+1);
-    
-    insert(headers, "Content-Length", len_str);
     insert(headers, "Content-Type", "text/html");
-    insert(headers, "Connection", "keep-alive");
+    insert(headers, "Connection", "close");
 
     return build_response(200, headers, buff);
 }
-
 
 
 

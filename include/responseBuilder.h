@@ -71,12 +71,17 @@ typedef struct response_t
     char* body;
 }response_t;
 
-
+// builds response object and automatically adds the content length header
 response_t* build_response(int status_code, hash_table_t* headers, char* body);
 
 char* response_to_str(response_t* resp);
 
 void free_response(response_t* resp);
+
+
+char* read_file(char* file_name);
+
+response_t* build_404();
 
 
 #endif

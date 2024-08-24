@@ -1,5 +1,4 @@
 #include "../../include/responseBuilder.h"
-#include <stdio.h>
 #include <string.h>
 #include <time.h>
 
@@ -12,6 +11,27 @@ char* strcpycat(char* dest, char* src)
     dest += len;
     return dest;
 }
+
+
+char* read_file(char* file_name)
+{
+    FILE* f = fopen(file_name, "rb");
+    if (!f) {
+        return NULL;
+    }
+
+    // get file len
+    fseek(f, 0, SEEK_END);
+    int len = ftell(f);
+    rewind(f);
+    // read to buff
+    char* buff = malloc(len + 1);
+    fread(buff, 1, len, f);
+    buff[len] = '\0';
+
+    return buff;
+}
+
 
 // helper function to find out the length of a response if it were to be a complete string
 int response_len(response_t* resp)
@@ -139,6 +159,16 @@ response_t* build_response(int status_code, hash_table_t* headers, char* body)
     resp->headers = headers;
     resp->body = body;
 
+    if (body) {
+        // add content length header
+        if (!headers) {
+            resp->headers = create_table();
+        }
+        char* len_str = malloc(21); // max digit lenth of unsigned long
+        sprintf(len_str, "%lu", strlen(resp->body)+1); // convert from char to int
+        insert(headers, "Content-Length", len_str);
+    }
+
     return resp;
 }
 
@@ -155,4 +185,19 @@ void free_response(response_t* resp)
             free(resp->body);
     }
     free(resp);
+}
+
+
+
+
+response_t* build_404()
+{
+    char* msg = read_file("404.html");
+    if (!msg) {
+        msg = strdup("<h1> 404 page not found <h1>");
+    }
+    hash_table_t* headers = create_table();
+    insert(headers, "Content-Type", "text/html");
+
+    return build_response(404, headers, msg);
 }

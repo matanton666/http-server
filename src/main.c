@@ -36,7 +36,7 @@ void* client_chat(void* client_data)
     char buff[2048];
     memset(buff, 0, 2048);
     recv(cli_data.client_descriptor, buff, 2048, 0);
-    printf("recieved: %s", buff);
+    // printf("recieved: %s", buff);
 
     remove_char_instances(buff, '\r');
 
@@ -55,27 +55,16 @@ void* client_chat(void* client_data)
         send(cli_data.client_descriptor, to_send, strlen(to_send) + 1, 0);
         free(to_send);
     }
-    // TODO: figure out w
 
-    // free_request_t(req);
-    // free_response(resp);
-
-
-
-    // while (true) {
-    //     memset(buff, 0, 256);
-    //     recv(cli_data.client_descriptor, buff, 256, 0);
-    //     printf("%s\nsending: ", buff);
-
-    //     fgets(buff, 256, stdin);
-
-    //     printf("%s\n", buff);
-    //     send(cli_data.client_descriptor, buff, 256, 0);
-    //     printf("client: ");
-    // }
-
+    free_request_t(req);
+    free_response(resp);
     free(client_data);
+
     return NULL;
+    // todo: make this a loop (something with keep-alive and close connection)
+    // todo: add 500 internal error, 302 redirect 
+    // todo: fix 404 free after 2 times error
+    // todo: add application/json for sending images and non text stuff
 }
 
 
