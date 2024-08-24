@@ -3,11 +3,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <strings.h>
+#include <sys/socket.h>
 #include <unistd.h>
 #include <errno.h>
 
 #include "../include/socketHandler.h"
 #include "../include/requestParser.h"
+#include "../include/requestHandler.h"
 
 
 void* client_chat(void* client_data);
@@ -42,6 +44,22 @@ void* client_chat(void* client_data)
     printf("\nreq type: %d\n", req->type);
     printf("URL: %s\n", req->url->domain);
     printf("data: \n%s\n", req->data);
+
+    response_t* resp = handle_request(req);
+    if (!resp) {
+        // todo: exit gracefully?
+        return NULL;
+    }
+    else {
+        char* to_send = response_to_str(resp);
+        send(cli_data.client_descriptor, to_send, strlen(to_send) + 1, 0);
+        free(to_send);
+    }
+    // TODO: figure out w
+
+    // free_request_t(req);
+    // free_response(resp);
+
 
 
     // while (true) {
