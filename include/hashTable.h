@@ -42,6 +42,7 @@ void point_next(hash_table_iter* iter);
 hash_table_t* create_table(void);
 
 // insert a key-value pair into the hash table
+// creates a copy of the strings
 void insert(hash_table_t* hashTable, const char* key, char* value);
 
 // search for a value by key in the hash table

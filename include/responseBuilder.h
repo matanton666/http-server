@@ -81,7 +81,13 @@ void free_response(response_t* resp);
 
 char* read_file(char* file_name);
 
+
+// not found
 response_t* build_404();
+// internal server error
+response_t* build_500();
+// redirect
+response_t* build_302();
 
 
 #endif

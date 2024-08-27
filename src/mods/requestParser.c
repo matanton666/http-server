@@ -1,5 +1,5 @@
 #include "../../include/requestParser.h"
-#include <string.h>
+
 
 request_t* parse_request(char* req)
 {
@@ -117,7 +117,15 @@ hash_table_t* parse_req_headers(char* req)
     }
     pos++;
 
-    while ((*pos && *(pos+1)) && (pos && pos+1) && (*pos != '\n' && *(pos+1) != '\n')) { // untill get to data part
+    char* headers_end = strstr(pos, "\n\n");
+    if (headers_end == NULL) {
+        headers_end = pos + strlen(pos);
+    }
+    else {
+        headers_end++;
+    }
+
+    while ((*pos && *(pos+1)) && pos != headers_end && pos+1 != headers_end) { // untill get to data part
         // isolate key
         char* colon = strstr(pos, ": ");
         if (!colon) return NULL;
@@ -144,7 +152,7 @@ hash_table_t* parse_req_headers(char* req)
 
 int validate_req_syntax(char* req)
 {
-    regex_t regex;
+    regex_t regex   ;
     char msgbuf[100];
     int reti;
     
@@ -208,7 +216,7 @@ url_t* parse_req_url(char* req, hash_table_t* headers)
     int path_len = path_end - path;
 
     // create one big string for entire url and make different parts point to certain portions
-    url->domain = (char*)malloc(strlen(host) + path_len); 
+    url->domain = (char*)malloc(strlen(host) + path_len + 1); 
     strcpy(url->domain, host);
     url->domain_len = strlen(host);
 

@@ -1,5 +1,4 @@
 #include "../../include/hashTable.h"
-#include <time.h>
 
 // Hash function to generate index
 unsigned int hash(const char* key) {
@@ -14,7 +13,7 @@ unsigned int hash(const char* key) {
 node_t* create_node(const char* key, char* value) {
     node_t* newNode = (node_t*)malloc(sizeof(node_t));
     newNode->key = strdup(key);
-    newNode->value = value;
+    newNode->value = strdup(value);
     newNode->next = NULL;
     return newNode;
 }
@@ -30,10 +29,13 @@ void insert(hash_table_t* hashTable, const char* key, char* value) {
     } else {
         node_t* current = head;
         node_t* prev = NULL;
-        while (current != NULL) {
+        while (current != NULL) { // append to end or update
             if (strcmp(current->key, key) == 0) {
-                current->value = value; // Update value if key already exists
+                free(current->value);
+                current->value = strdup(value); // Update value if key already exists
+
                 free(newNode->key);
+                free(newNode->value);
                 free(newNode);
                 return;
             }
@@ -100,6 +102,7 @@ void free_table(hash_table_t* hashTable) {
             node_t* temp = current;
             current = current->next;
             free(temp->key);
+            free(temp->value); 
             free(temp);
         }
     }

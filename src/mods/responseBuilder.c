@@ -1,6 +1,6 @@
 #include "../../include/responseBuilder.h"
-#include <string.h>
 #include <time.h>
+
 
 
 // helper function that copies from src to dest and puts dest pointer to one character after end of copy
@@ -38,7 +38,7 @@ int response_len(response_t* resp)
 {
   int len = strlen("HTTP/1.x ");
     len += 4; // code
-    len += strlen(resp->reason_phrase + 2); // +2 for enter
+    len += strlen(resp->reason_phrase) + 2; // +2 for enter
 
     if (resp->headers) {
         hash_table_iter* iter = create_iterator(resp->headers);
@@ -52,7 +52,7 @@ int response_len(response_t* resp)
     }
 
     len += 2; // for \r\n
-    if (resp->body) {
+    if (resp->body != NULL) {
         len += strlen(resp->body);
     }
 
@@ -72,7 +72,7 @@ char* response_to_str(response_t* resp)
     char* tmp = response;
 
     tmp = strcpycat(tmp, "HTTP/1.");
-    *tmp = resp->version + '0';
+    *tmp = '0' + resp->version;
     tmp++;
     *tmp = ' ';
     tmp++;
@@ -157,16 +157,21 @@ response_t* build_response(int status_code, hash_table_t* headers, char* body)
     resp->reason_phrase = strdup(reason);
 
     resp->headers = headers;
-    resp->body = body;
 
     if (body) {
+        resp->body = strdup(body);
         // add content length header
-        if (!headers) {
+        if (!resp->headers) {
             resp->headers = create_table();
         }
         char* len_str = malloc(21); // max digit lenth of unsigned long
-        sprintf(len_str, "%lu", strlen(resp->body)+1); // convert from char to int
-        insert(headers, "Content-Length", len_str);
+        sprintf(len_str, "%lu", strlen(resp->body)); // convert from char to int
+        //                          todo: might need to remove ^
+        insert(resp->headers, "Content-Length", len_str);
+        free(len_str);
+    }
+    else {
+        resp->body = NULL;
     }
 
     return resp;
@@ -199,5 +204,8 @@ response_t* build_404()
     hash_table_t* headers = create_table();
     insert(headers, "Content-Type", "text/html");
 
-    return build_response(404, headers, msg);
+    response_t* resp = build_response(404, headers, msg);
+    free(msg);
+    return resp;
 }
+

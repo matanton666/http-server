@@ -1,19 +1,19 @@
 #include "../../include/requestHandler.h"
-#include <string.h>
 
-char* res_file =  "../res\0";
+const char* res_folder =  "../res\0";
 
 
 response_t* handle_get(request_t* req)
 {
     // make sure file name is ../res/*
-    char* file_name = malloc(strlen(res_file) + req->url->path_len);
-    strcpy(file_name, res_file);
+    char* file_name = malloc(strlen(res_folder) + req->url->path_len);
+    strcpy(file_name, res_folder);
     strncat(file_name, req->url->path, req->url->path_len);
 
-    if (strlen(file_name) == strlen(res_file)) { 
+    if (strlen(file_name) == strlen(res_folder)) {  // get '/'
         // todo: redirect
-        strcat(file_name, "/index.html");
+        free(file_name);
+        return NULL;
     }
 
     char* buff = read_file(file_name);
@@ -24,9 +24,11 @@ response_t* handle_get(request_t* req)
 
     hash_table_t* headers = create_table();
     insert(headers, "Content-Type", "text/html");
-    insert(headers, "Connection", "close");
+    insert(headers, "Connection", "keep-alive");
 
-    return build_response(200, headers, buff);
+    response_t* resp = build_response(200, headers, buff);
+    free(buff);
+    return resp;
 }
 
 
