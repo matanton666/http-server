@@ -4,6 +4,7 @@
 #include <string.h>
 #include <strings.h>
 #include <sys/socket.h>
+#include <time.h>
 #include <unistd.h>
 
 #include "../include/socketHandler.h"
@@ -34,51 +35,53 @@ void* client_chat(void* client_data)
 
     char buff[4096];
 
-
-    while (true) {
     
-        memset(buff, 0, 4096);
-        recv(cli_data.client_descriptor, buff, 4096, 0);
-        // printf("recieved: %s", buff);
+    memset(buff, 0, 4096);
+    recv(cli_data.client_descriptor, buff, 4096, 0);
+    // printf("recieved: %s", buff);
 
-        remove_char_instances(buff, '\r');
+    remove_char_instances(buff, '\r');
 
-        request_t* req = parse_request(buff);
-        if (!req) {
-            break;
-        }
-        printf("\nreq type: %d\n", req->type);
-        printf("URL: %s\n", req->url->domain);
-        printf("data: \n%s\n", req->data);
-
-        response_t* resp = handle_request(req);
-        if (!resp) {
-            // todo: exit gracefully?
-            free_request_t(req);
-            break;
-        }
-        else {
-            char* to_send = response_to_str(resp);
-            send(cli_data.client_descriptor, to_send, strlen(to_send) + 1, 0);
-            free(to_send);
-
-            char* con_type = search(resp->headers, "Connection");
-            if (con_type && strncmp(con_type, "close", 5) == 0) {
-                free_request_t(req);
-                free_response(resp);
-                break;
-            }
-
-        }
-
-        free_request_t(req);
-        free_response(resp);
+    request_t* req = parse_request(buff);
+    if (!req) {
+        printf("invalid request, exiting");
+        printf("\nerrno: %d\n", errno);
+        return NULL;
     }
+    printf("\nreq type: %d\n", req->type);
+    printf("URL: %s\n", req->url->domain);
+    printf("data: \n%s\n", req->data);
+
+    response_t* resp = handle_request(req);
+    if (!resp) {
+        // todo: exit gracefully?
+        printf("\nresponse not good, exeting");
+        printf("\nerrno: %d", errno);
+        free_request_t(req);
+        return NULL;
+    }
+    else {
+        char* to_send;
+        unsigned long send_len = response_to_buff(resp, &to_send);
+        printf("\nlen: %lu\n", send_len);
+        send(cli_data.client_descriptor, to_send, send_len, 0);
+        free(to_send);
+
+        char* con_type = search(resp->headers, "Connection");
+        if (con_type && strncmp(con_type, "close", 5) == 0) {
+            free_request_t(req);
+            free_response(resp);
+            return NULL;
+        }
+
+    }
+
+    free_request_t(req);
+    free_response(resp);
 
 
     free(client_data);
     return NULL;
-
 
     // todo: add 500 internal error, 302 redirect 
     // todo: fix 404 free after 2 times error

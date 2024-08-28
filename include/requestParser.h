@@ -4,10 +4,12 @@
 
 #include "socketHandler.h"
 #include "hashTable.h"
+#include "errors.h"
 
 #include <string.h>
 #include <stdio.h>
 #include <regex.h>
+
 
 
 

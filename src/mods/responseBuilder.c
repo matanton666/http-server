@@ -1,4 +1,5 @@
 #include "../../include/responseBuilder.h"
+#include <string.h>
 #include <time.h>
 
 
@@ -13,23 +14,24 @@ char* strcpycat(char* dest, char* src)
 }
 
 
-char* read_file(char* file_name)
+unsigned long read_file(char* file_name, char** content)
 {
     FILE* f = fopen(file_name, "rb");
     if (!f) {
-        return NULL;
+        *content = NULL;
+        return 0;
     }
 
     // get file len
     fseek(f, 0, SEEK_END);
-    int len = ftell(f);
+    unsigned long len = ftell(f);
     rewind(f);
     // read to buff
-    char* buff = malloc(len + 1);
-    fread(buff, 1, len, f);
-    buff[len] = '\0';
+    *content = malloc(len + 1);
+    fread(*content, 1, len, f);
+    (*content)[len] = '\0';
 
-    return buff;
+    return len;
 }
 
 
@@ -52,9 +54,7 @@ int response_len(response_t* resp)
     }
 
     len += 2; // for \r\n
-    if (resp->body != NULL) {
-        len += strlen(resp->body);
-    }
+    len += resp->body_len;
 
     return len;
 }
@@ -63,13 +63,12 @@ int response_len(response_t* resp)
 
 
 
-char* response_to_str(response_t* resp)
+unsigned long response_to_buff(response_t* resp, char** buff)
 {
     int len = response_len(resp);
 
-
-    char* response = (char*)malloc(len+1);
-    char* tmp = response;
+    *buff = (char*)malloc(len+1);
+    char* tmp = *buff;
 
     tmp = strcpycat(tmp, "HTTP/1.");
     *tmp = '0' + resp->version;
@@ -104,15 +103,17 @@ char* response_to_str(response_t* resp)
 
     tmp = strcpycat(tmp, "\r\n");
     if (resp->body) {
-        tmp = strcpycat(tmp, resp->body);
+        memcpy(tmp, resp->body, resp->body_len);
+        tmp += resp->body_len;
     }
-    *tmp = '\0';
-    return response;
+    *tmp = '\0'; // todo: could be problematic
+
+    return len + 1;
 }
 
 
 
-response_t* build_response(int status_code, hash_table_t* headers, char* body)
+response_t* build_response(int status_code, hash_table_t* headers, char* body, unsigned long body_len)
 {
     response_t* resp = malloc(sizeof(response_t));
     resp->version = V_ONE;
@@ -155,23 +156,25 @@ response_t* build_response(int status_code, hash_table_t* headers, char* body)
             break;
     }
     resp->reason_phrase = strdup(reason);
-
     resp->headers = headers;
 
     if (body) {
-        resp->body = strdup(body);
+        resp->body = malloc(body_len);
+        memcpy(resp->body, body, body_len);
+        resp->body_len = body_len;
+
         // add content length header
         if (!resp->headers) {
             resp->headers = create_table();
         }
         char* len_str = malloc(21); // max digit lenth of unsigned long
-        sprintf(len_str, "%lu", strlen(resp->body)); // convert from char to int
-        //                          todo: might need to remove ^
+        sprintf(len_str, "%lu", body_len); // convert from char to int
         insert(resp->headers, "Content-Length", len_str);
         free(len_str);
     }
     else {
         resp->body = NULL;
+        resp->body_len = body_len;
     }
 
     return resp;
@@ -197,14 +200,15 @@ void free_response(response_t* resp)
 
 response_t* build_404()
 {
-    char* msg = read_file("404.html");
+    char* msg = NULL;
+    unsigned long len = read_file("404.html", &msg);
     if (!msg) {
         msg = strdup("<h1> 404 page not found <h1>");
     }
     hash_table_t* headers = create_table();
     insert(headers, "Content-Type", "text/html");
 
-    response_t* resp = build_response(404, headers, msg);
+    response_t* resp = build_response(404, headers, msg, len);
     free(msg);
     return resp;
 }

@@ -3,7 +3,10 @@
 
 request_t* parse_request(char* req)
 {
-    if (!validate_req_syntax(req)) return NULL;
+    if (!validate_req_syntax(req)) {
+        errno = REQ_SYNTAX_ERR;
+        return NULL;
+    }
     
     request_t* desir_req = (request_t*)malloc(sizeof(request_t)); // deserialized request
 
@@ -13,6 +16,7 @@ request_t* parse_request(char* req)
     hash_table_t* headers = parse_req_headers(req);
     if (!headers) {
         free(desir_req);
+        errno = PARSE_HEADERS_ERR;
         return NULL;
     }
 
@@ -20,6 +24,7 @@ request_t* parse_request(char* req)
     if (!url) {
         free(desir_req);
         free_table(headers);
+        errno = URL_PARSE_ERR;
         return NULL;
     }
 
@@ -27,7 +32,7 @@ request_t* parse_request(char* req)
     desir_req->url = url;
 
     char* data = strstr(req, "\n\n");
-    if (data) {
+    if (data && data[2] != '\0') { // contains data
         data += 2; // skip 2 \n
         desir_req->data = (char*)malloc(strlen(data) + 1);
         strncpy(desir_req->data, data, strlen(data));
@@ -107,7 +112,10 @@ hash_table_t* parse_req_headers(char* req)
 {
 
     hash_table_t* headers = create_table();
-    if (!headers || !req || strlen(req) == 0) return NULL;
+    if (!headers || !req || strlen(req) == 0) {
+        errno = -1;
+        return NULL;
+    } 
 
     char* tmp = strdup(req);
     char* pos = tmp;
@@ -166,6 +174,7 @@ int validate_req_syntax(char* req)
         strncpy(pattern, "^(GET|POST|PUT|DELETE|HEAD|OPTIONS|TRACE|CONNECT) (/|/[^ ]+) HTTP/1\.[0-9]\n([A-Za-z0-9-]+: .+\n)*\n(.*\n*)*", sizeof(pattern) - 1);
         pattern[sizeof(pattern) - 1] = '\0';  // Ensure null-termination
     }
+    // printf("\n%s\n", pattern);
 
 
     // Compile regex

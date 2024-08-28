@@ -2,6 +2,7 @@
 #include "../include/responseBuilder.h"
 #include "unity_internals.h"
 #include <string.h>
+#include <time.h>
 
 void setUp(void) {}
 
@@ -13,7 +14,7 @@ void test_build_response_should_create_valid_response_for_200_status_code(void)
     insert(headers, "Content-Type", "text/html");
     char* body = "Hello, World!";
 
-    response_t* resp = build_response(200, headers, body);
+    response_t* resp = build_response(200, headers, body, strlen(body));
 
     TEST_ASSERT_EQUAL_STRING("200", resp->status_code);
     TEST_ASSERT_EQUAL_STRING("OK", resp->reason_phrase);
@@ -28,7 +29,7 @@ void test_build_response_should_create_valid_response_for_404_status_code(void)
     hash_table_t* headers = create_table();
     insert(headers, "Content-Type", "text/html");
 
-    response_t* resp = build_response(404, headers, NULL);
+    response_t* resp = build_response(404, headers, NULL, 0);
 
     TEST_ASSERT_EQUAL_STRING("404", resp->status_code);
     TEST_ASSERT_EQUAL_STRING("Not Found", resp->reason_phrase);
@@ -45,10 +46,11 @@ void test_response_to_str_should_convert_response_to_string(void)
     insert(headers, "Content-Length", "12");
     char* body = "Hello, World";
 
-    response_t* resp = build_response(200, headers, body);
+    response_t* resp = build_response(200, headers, body, strlen(body));
 
     char* expected_response = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: 12\r\n\r\nHello, World";
-    char* actual_response = response_to_str(resp);
+    char* actual_response = NULL;
+    response_to_buff(resp,&actual_response);
 
     TEST_ASSERT_EQUAL_STRING(expected_response, actual_response);
 
@@ -62,7 +64,7 @@ void test_build_response_should_handle_invalid_status_code(void)
     hash_table_t* headers = create_table();
     insert(headers, "Content-Type", "text/html");
 
-    response_t* resp = build_response(999, headers, NULL);
+    response_t* resp = build_response(999, headers, NULL, 0);
 
     TEST_ASSERT_EQUAL_STRING("500", resp->status_code);
     TEST_ASSERT_EQUAL_STRING("Internal Server Error", resp->reason_phrase);
@@ -74,7 +76,7 @@ void test_build_response_should_handle_invalid_status_code(void)
 
 void test_build_response_should_handle_null_headers(void)
 {
-    response_t* resp = build_response(200, NULL, "Hello, World!");
+    response_t* resp = build_response(200, NULL, "Hello, World!", 13);
 
     TEST_ASSERT_EQUAL_STRING("200", resp->status_code);
     TEST_ASSERT_EQUAL_STRING("OK", resp->reason_phrase);
@@ -89,11 +91,12 @@ void test_response_to_str_should_handle_null_body(void)
     hash_table_t* headers = create_table();
     insert(headers, "Content-Type", "text/html");
 
-    response_t* resp = build_response(404, headers, NULL);
+    response_t* resp = build_response(404, headers, NULL, 0);
 
     char* expected_response = "HTTP/1.1 404 Not Found\r\nContent-Type: text/html\r\n\r\n";
-    char* actual_response = response_to_str(resp);
-
+    char* actual_response = NULL;
+    response_to_buff(resp,&actual_response);
+    
     TEST_ASSERT_EQUAL_STRING(expected_response, actual_response);
 
     free(actual_response);
@@ -102,10 +105,12 @@ void test_response_to_str_should_handle_null_body(void)
 
 void test_response_to_str_should_handle_null_headers(void)
 {
-    response_t* resp = build_response(200, NULL, "Hello, World!");
+    response_t* resp = build_response(200, NULL, "Hello, World!", 13);
 
     char* expected_response = "HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\nHello, World!";
-    char* actual_response = response_to_str(resp);
+    char* actual_response = NULL;
+    response_to_buff(resp,&actual_response);
+ 
 
     TEST_ASSERT_EQUAL_STRING(expected_response, actual_response);
 

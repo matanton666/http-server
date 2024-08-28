@@ -69,17 +69,19 @@ typedef struct response_t
     char* reason_phrase;
     hash_table_t* headers;
     char* body;
+    unsigned long body_len;
 }response_t;
 
 // builds response object and automatically adds the content length header
-response_t* build_response(int status_code, hash_table_t* headers, char* body);
+response_t* build_response(int status_code, hash_table_t* headers, char* body, unsigned long body_len);
 
-char* response_to_str(response_t* resp);
+// convert response to buffer that can be sent, returns length of buffer
+unsigned long response_to_buff(response_t* resp, char** buff);
 
 void free_response(response_t* resp);
 
-
-char* read_file(char* file_name);
+// returns length of file, content will contain malloced file content
+unsigned long read_file(char* file_name, char** content);
 
 
 // not found
