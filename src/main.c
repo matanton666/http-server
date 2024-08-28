@@ -83,11 +83,9 @@ void* client_chat(void* client_data)
     free(client_data);
     return NULL;
 
+    // todo: fix 404 not being sent correctly
     // todo: add 500 internal error, 302 redirect 
-    // todo: fix 404 free after 2 times error
-    // todo: fix free error when asking for /css/*
-    // todo: add application/json for sending images and non text stuff
-    // fixme: mabe error has to do with current worspace directory in debug being global and not in /build
+    // todo: add application/json for sending images and non text stuff (content type)
 }
 
 

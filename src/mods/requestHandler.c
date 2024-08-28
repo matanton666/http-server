@@ -25,10 +25,16 @@ response_t* handle_get(request_t* req)
         free(file_name);
         return build_404();
     }
-    // todo: update code to handle file len
+    // todo: create function for figuring out content type
+
+    char* content_type = "text/html";
+    if (strstr(file_name, "css")) {
+        content_type = "text/css";
+    }
+
     hash_table_t* headers = create_table();
-    insert(headers, "Content-Type", "text/html");
-    insert(headers, "Connection", "keep-alive");
+    insert(headers, "Content-Type", content_type);
+    insert(headers, "Connection", "close");
 
     response_t* resp = build_response(200, headers, buff, len);
     free(buff);

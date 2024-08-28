@@ -89,7 +89,7 @@ void test_build_response_should_handle_null_headers(void)
 void test_response_to_str_should_handle_null_body(void)
 {
     hash_table_t* headers = create_table();
-    insert(headers, "Content-Type", "text/html");
+    insert(headers, "Content-Type", "text/*");
 
     response_t* resp = build_response(404, headers, NULL, 0);
 
