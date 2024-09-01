@@ -43,7 +43,7 @@ hash_table_t* create_table(void);
 
 // insert a key-value pair into the hash table
 // creates a copy of the strings
-void insert(hash_table_t* hashTable, const char* key, char* value);
+void insert(hash_table_t* hashTable, const char* key, const char* value);
 
 // search for a value by key in the hash table
 // returns null if not found

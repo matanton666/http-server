@@ -4,7 +4,7 @@
 
 #include "socketHandler.h"
 #include "hashTable.h"
-#include "errors.h"
+#include "helpers.h"
 
 #include <string.h>
 #include <stdio.h>

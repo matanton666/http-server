@@ -1,8 +1,7 @@
 #include "../../include/responseBuilder.h"
-#include <string.h>
-#include <time.h>
 
-
+const char* res_folder =  "../res";
+const char* fourOfour = "/404.html";
 
 // helper function that copies from src to dest and puts dest pointer to one character after end of copy
 char* strcpycat(char* dest, char* src)
@@ -11,6 +10,17 @@ char* strcpycat(char* dest, char* src)
     strncpy(dest, src, len);
     dest += len;
     return dest;
+}
+
+char* construct_file_path(const char* file_name, int name_len)
+{
+    // make sure file name is ../res/*
+    char* file_path = malloc(strlen(res_folder) + name_len + 1);
+    strcpy(file_path, res_folder);
+    strncat(file_path, file_name, name_len);
+    file_path[strlen(res_folder)+name_len] = '\0';
+
+    return file_path;
 }
 
 
@@ -201,15 +211,40 @@ void free_response(response_t* resp)
 response_t* build_404()
 {
     char* msg = NULL;
-    unsigned long len = read_file("404.html", &msg);
+    char* file_name = construct_file_path(fourOfour, strlen(fourOfour));
+    unsigned long len = read_file(file_name, &msg);
+    printf("\nFILENAME: %s", file_name);
+    free(file_name);
     if (!msg) {
         msg = strdup("<h1> 404 page not found <h1>");
+        len = strlen(msg);
     }
     hash_table_t* headers = create_table();
     insert(headers, "Content-Type", "text/html");
 
     response_t* resp = build_response(404, headers, msg, len);
     free(msg);
+    return resp;
+}
+
+
+response_t* build_302(const char* new_path)
+{
+    char* path = strdup(new_path);
+    if (path[0] != '/') {
+        free(path);
+
+        path = malloc(strlen(new_path) + 2);
+        path[0] = '\0';
+        strcat(path, "/");
+        strncat(path, new_path, strlen(new_path));
+    }
+
+    hash_table_t* headers = create_table();
+    insert(headers, "Location", new_path);
+    response_t* resp = build_response(302, headers, NULL, 0);
+
+    free(path);
     return resp;
 }
 

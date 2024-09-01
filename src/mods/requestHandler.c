@@ -1,23 +1,15 @@
 #include "../../include/requestHandler.h"
-#include <string.h>
-#include <time.h>
 
-const char* res_folder =  "../res";
-
+const char* index_file = "index.html";
 
 response_t* handle_get(request_t* req)
 {
-    // make sure file name is ../res/*
-    char* file_name = malloc(strlen(res_folder) + req->url->path_len + 1);
-    strcpy(file_name, res_folder);
-    strncat(file_name, req->url->path, req->url->path_len);
-    file_name[strlen(res_folder)+req->url->path_len] = '\0';
-
-    if (strlen(file_name) == strlen(res_folder)) {  // get '/'
-        // todo: redirect
-        free(file_name);
-        return NULL;
+    if (req->url->path_len == 1) {  // get '/' : return redirect to index.html
+        response_t* resp = build_302(index_file);
+        return resp;
     }
+
+    char* file_name = construct_file_path(req->url->path, req->url->path_len); 
 
     char* buff = NULL;
     unsigned long len = read_file(file_name, &buff);
@@ -31,10 +23,11 @@ response_t* handle_get(request_t* req)
     if (strstr(file_name, "css")) {
         content_type = "text/css";
     }
+    free(file_name);
 
     hash_table_t* headers = create_table();
     insert(headers, "Content-Type", content_type);
-    insert(headers, "Connection", "close");
+    insert(headers, "Connection", "keep-alive");
 
     response_t* resp = build_response(200, headers, buff, len);
     free(buff);

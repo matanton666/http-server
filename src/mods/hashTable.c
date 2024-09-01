@@ -1,6 +1,5 @@
 #include "../../include/hashTable.h"
 
-// Hash function to generate index
 unsigned int hash(const char* key) {
     unsigned int hashValue = 0;
     while (*key) {
@@ -9,8 +8,7 @@ unsigned int hash(const char* key) {
     return hashValue % TABLE_SIZE;
 }
 
-// Create a new node
-node_t* create_node(const char* key, char* value) {
+node_t* create_node(const char* key, const char* value) {
     node_t* newNode = (node_t*)malloc(sizeof(node_t));
     newNode->key = strdup(key);
     newNode->value = strdup(value);
@@ -18,8 +16,7 @@ node_t* create_node(const char* key, char* value) {
     return newNode;
 }
 
-// Insert key-value pair into hash table
-void insert(hash_table_t* hashTable, const char* key, char* value) {
+void insert(hash_table_t* hashTable, const char* key, const char* value) {
     unsigned int index = hash(key);
     node_t* newNode = create_node(key, value);
     node_t* head = hashTable->table[index];
@@ -46,7 +43,6 @@ void insert(hash_table_t* hashTable, const char* key, char* value) {
     }
 }
 
-// Search for a key in the hash table
 char* search(hash_table_t* hashTable, const char* key) {
     unsigned int index = hash(key);
     node_t* current = hashTable->table[index];
@@ -60,7 +56,6 @@ char* search(hash_table_t* hashTable, const char* key) {
     return NULL; // Key not found
 }
 
-// Remove a key-value pair from the hash table
 void delete_node(hash_table_t* hashTable, const char* key) {
     unsigned int index = hash(key);
     node_t* current = hashTable->table[index];
@@ -85,7 +80,6 @@ void delete_node(hash_table_t* hashTable, const char* key) {
     free(current);
 }
 
-// Initialize hash table
 hash_table_t* create_table() {
     hash_table_t* hashTable = (hash_table_t*)malloc(sizeof(hash_table_t));
     for (int i = 0; i < TABLE_SIZE; i++) {
@@ -94,7 +88,6 @@ hash_table_t* create_table() {
     return hashTable;
 }
 
-// Free memory of the hash table
 void free_table(hash_table_t* hashTable) {
     for (int i = 0; i < TABLE_SIZE; i++) {
         node_t* current = hashTable->table[i];

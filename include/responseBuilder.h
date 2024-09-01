@@ -5,6 +5,9 @@
 #include "requestParser.h"
 #include <string.h>
 #include <stdio.h>
+#include <time.h>
+
+
 
 /*
 HTTP/1.1 200 OK
@@ -83,13 +86,19 @@ void free_response(response_t* resp);
 // returns length of file, content will contain malloced file content
 unsigned long read_file(char* file_name, char** content);
 
+// mallocs file name
+char* construct_file_path(const char* file_name, int name_len);
+
+
 
 // not found
 response_t* build_404();
+
 // internal server error
 response_t* build_500();
+
 // redirect
-response_t* build_302();
+response_t* build_302(const char* new_path);
 
 
 #endif
