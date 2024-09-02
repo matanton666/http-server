@@ -43,54 +43,43 @@ void* client_chat(void* client_data)
 
     remove_char_instances(buff, '\r');
 
-    clock_t s = timer_start(); // todo: CHECK WHAT TAKES SO MUCH TIME
-    request_t* req = parse_request(buff);
-    print_timer_end("parse_request", s);
+    clock_t s = timer_start(); 
+    request_t* req = parse_request(buff); // this function takes the most time to execute
     if (!req) {
         printf("invalid request, exiting");
         printf("\nerrno: %d\n", errno);
         return NULL;
     }
+
     // printf("\nreq type: %d\n", req->type);
-    printf("URL: %s\n", req->url->domain);
+    // printf("URL: %s\n", req->url->domain);
     // printf("data: \n%s\n", req->data);
 
-    s = timer_start(); // todo: check what takes time
     response_t* resp = handle_request(req);
-    print_timer_end("handle request", s);
     if (!resp) {
-        //  todo: exit gracefully?
         printf("\nresponse not good, exeting");
         printf("\nerrno: %d", errno);
         free_request_t(req);
-        return NULL;
+        resp = build_500();
     }
-    else {
-        char* to_send;
-        unsigned long send_len = response_to_buff(resp, &to_send);
-        // printf("\nlen: %lu\n", send_len);
-        send(cli_data.client_descriptor, to_send, send_len, 0);
-        free(to_send);
 
-        char* con_type = search(resp->headers, "Connection");
-        if (con_type && strncmp(con_type, "close", 5) == 0) {
-            free_request_t(req);
-            free_response(resp);
-            return NULL;
-        }
+    char* to_send;
+    unsigned long send_len = response_to_buff(resp, &to_send);
+    send(cli_data.client_descriptor, to_send, send_len, 0);
+    free(to_send);
 
-    }
+    print_timer_end(req->url->domain, s);
     printf("\n");
 
     free_request_t(req);
     free_response(resp);
 
+    close(cli_data.client_descriptor);
 
     free(client_data);
     return NULL;
 
-    // todo: fix 404 not being sent correctly
-    // todo: add 500 internal error, 302 redirect 
+    // todo: add 500 internal error
     // todo: add application/json for sending images and non text stuff (content type)
 }
 

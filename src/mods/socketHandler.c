@@ -57,15 +57,16 @@ int accept_loop(int socket_desc, void* (*client_handler)(void*))
 
 
         pthread_t thread;
-        int status = pthread_create(&thread, NULL,
-         client_handler, (void*)data );
+        int status = pthread_create(&thread, 
+         NULL,
+         client_handler, 
+         (void*)data
+        );
         if (status < 0 || pthread_detach(thread) < 0) 
         {
             printf("count not create thread for client");
             free(data);
         }
-
-        sleep(1);
 
     }
     return 0;

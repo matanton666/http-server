@@ -116,7 +116,7 @@ unsigned long response_to_buff(response_t* resp, char** buff)
         memcpy(tmp, resp->body, resp->body_len);
         tmp += resp->body_len;
     }
-    *tmp = '\0'; // todo: could be problematic
+    *tmp = '\0';
 
     return len + 1;
 }
@@ -248,3 +248,15 @@ response_t* build_302(const char* new_path)
     return resp;
 }
 
+
+response_t* build_500()
+{
+    char* msg = "<html> \
+<head><title>500 Internal Server Error</title></head> \
+<body>Something went wrong.</body> \
+</html>";
+
+    hash_table_t* headers = create_table();
+    insert(headers, "Content-Type", "text/html");
+    return build_response(500, headers, msg, strlen(msg));
+}
