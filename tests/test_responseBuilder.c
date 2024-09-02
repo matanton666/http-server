@@ -80,7 +80,7 @@ void test_build_response_should_handle_null_headers(void)
 
     TEST_ASSERT_EQUAL_STRING("200", resp->status_code);
     TEST_ASSERT_EQUAL_STRING("OK", resp->reason_phrase);
-    TEST_ASSERT_NULL(resp->headers);
+    TEST_ASSERT_NOT_NULL(resp->headers);
     TEST_ASSERT_EQUAL_STRING("Hello, World!", resp->body);
 
     free_response(resp);
@@ -89,7 +89,7 @@ void test_build_response_should_handle_null_headers(void)
 void test_response_to_str_should_handle_null_body(void)
 {
     hash_table_t* headers = create_table();
-    insert(headers, "Content-Type", "text/*");
+    insert(headers, "Content-Type", "text/html");
 
     response_t* resp = build_response(404, headers, NULL, 0);
 
@@ -127,7 +127,7 @@ int main(void)
     RUN_TEST(test_response_to_str_should_convert_response_to_string);
     RUN_TEST(test_response_to_str_should_handle_null_body);
     RUN_TEST(test_response_to_str_should_handle_null_headers);
-    // RUN_TEST(test_build_response_should_handle_null_headers);
+    RUN_TEST(test_build_response_should_handle_null_headers);
 
     return UNITY_END();
 }
