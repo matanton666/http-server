@@ -89,6 +89,9 @@ unsigned long read_file(char* file_name, char** content);
 // mallocs file name
 char* construct_file_path(const char* file_name, int name_len);
 
+// figure out which content type to put, returns const char* that is not allocated
+const char*  identify_content_type(char* file_name);
+
 
 
 // not found

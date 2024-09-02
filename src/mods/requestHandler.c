@@ -19,17 +19,13 @@ response_t* handle_get(request_t* req)
     }
     // todo: create function for figuring out content type
 
-    char* content_type = "text/html";
-    if (strstr(file_name, "css")) {
-        content_type = "text/css";
-    }
-    free(file_name);
 
     hash_table_t* headers = create_table();
-    insert(headers, "Content-Type", content_type);
+    insert(headers, "Content-Type", identify_content_type(file_name));
     insert(headers, "Connection", "close");
 
     response_t* resp = build_response(200, headers, buff, len);
+    free(file_name);
     free(buff);
     return resp;
 }

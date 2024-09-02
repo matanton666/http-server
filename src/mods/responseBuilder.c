@@ -1,7 +1,16 @@
 #include "../../include/responseBuilder.h"
+#include <string.h>
 
 const char* res_folder =  "../res";
 const char* fourOfour = "/404.html";
+
+const int extentions_len = 11;
+const char extentions[][6] = {"html", "css", "js", "json", "txt", "md",
+    "mp3", "jpeg", "jpg", "png", "webp"};
+const char cont_types[][25] = {"text/html", "text/css", "text/javascript",
+    "application/json", "text/plain", "text/markdown", "application/octet-stream",
+    "image/jpeg", "image/jpg", "image/png", "image/webp"};
+
 
 // helper function that copies from src to dest and puts dest pointer to one character after end of copy
 char* strcpycat(char* dest, char* src)
@@ -203,6 +212,31 @@ void free_response(response_t* resp)
             free(resp->body);
     }
     free(resp);
+}
+
+
+
+const char*  identify_content_type(char* file_name)
+{
+    char* ext = file_name + strlen(file_name);
+    while (ext != file_name && *ext != '.') {
+        ext--;
+    }
+
+    if (ext == file_name) { // no file extension
+        return "text/plain";
+    }
+
+    ext++; // skip . before file extention
+
+    const int ext_len = strlen(ext);
+    for (int i = 0; i < extentions_len; i++) {
+        if (strncmp(ext, extentions[i], ext_len) == 0) {
+            return cont_types[i];
+        }
+    }
+
+    return "text/plain";
 }
 
 

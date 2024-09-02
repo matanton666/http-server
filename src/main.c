@@ -45,22 +45,21 @@ void* client_chat(void* client_data)
 
     clock_t s = timer_start(); 
     request_t* req = parse_request(buff); // this function takes the most time to execute
+    response_t* resp = NULL;
     if (!req) {
         printf("invalid request, exiting");
         printf("\nerrno: %d\n", errno);
-        return NULL;
-    }
-
-    // printf("\nreq type: %d\n", req->type);
-    // printf("URL: %s\n", req->url->domain);
-    // printf("data: \n%s\n", req->data);
-
-    response_t* resp = handle_request(req);
-    if (!resp) {
-        printf("\nresponse not good, exeting");
-        printf("\nerrno: %d", errno);
         resp = build_500();
     }
+    else {
+        resp = handle_request(req);
+        if (!resp) {
+            printf("\nresponse not good, exeting");
+            printf("\nerrno: %d", errno);
+            resp = build_500();
+        }
+    }
+
 
     char* to_send;
     unsigned long send_len = response_to_buff(resp, &to_send);
@@ -78,7 +77,6 @@ void* client_chat(void* client_data)
     free(client_data);
     return NULL;
 
-    // todo: add application/json for sending images and non text stuff (content type)
 }
 
 
