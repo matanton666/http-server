@@ -27,7 +27,7 @@ response_t* handle_get(request_t* req)
 
     hash_table_t* headers = create_table();
     insert(headers, "Content-Type", content_type);
-    insert(headers, "Connection", "keep-alive");
+    insert(headers, "Connection", "close");
 
     response_t* resp = build_response(200, headers, buff, len);
     free(buff);

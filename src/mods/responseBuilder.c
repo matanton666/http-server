@@ -253,7 +253,8 @@ response_t* build_500()
 {
     char* msg = "<html> \
 <head><title>500 Internal Server Error</title></head> \
-<body>Something went wrong.</body> \
+<body><h1>500 Internal Server Error<h1>  \
+Something went wrong.</body> \
 </html>";
 
     hash_table_t* headers = create_table();

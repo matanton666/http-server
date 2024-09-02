@@ -59,7 +59,6 @@ void* client_chat(void* client_data)
     if (!resp) {
         printf("\nresponse not good, exeting");
         printf("\nerrno: %d", errno);
-        free_request_t(req);
         resp = build_500();
     }
 
@@ -79,7 +78,6 @@ void* client_chat(void* client_data)
     free(client_data);
     return NULL;
 
-    // todo: add 500 internal error
     // todo: add application/json for sending images and non text stuff (content type)
 }
 
